@@ -1,6 +1,6 @@
 import numpy as np
 import PyCO2SYS as pyco2
-import utils.constants as constants
+from . import constants
 
 def alpha_to_epsilon(alpha):
     """Converts alpha value to epsilon."""

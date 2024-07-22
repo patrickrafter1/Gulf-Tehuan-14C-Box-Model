@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import utils.data_output as data_output
+from . import data_output
 import os
 
 def plot_variables(time, DIC, ALK, d13C, temp_celsius, salinity,spin_up_time, title="Model results"):

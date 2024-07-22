@@ -7,12 +7,10 @@ import numpy as np
 from scipy.integrate import solve_ivp
 import time
 
-import utils.constants as constants
-import utils.fluxes as fluxes
-import utils.data_input as data_input
-import utils.data_output as data_output
-import utils.plotting as plot
-
+from utils import constants
+from utils import fluxes
+from utils import data_input
+from utils import data_output
 
 class MixedLayerModel:
     """
@@ -176,6 +174,8 @@ class MixedLayerModel:
             time=self.time,
             output=self.output,
             label=self.label_initial_conditions,
+            salinity=self.salinity,
+            temperature=self.temp_celsius,
         )
 
 
@@ -186,13 +186,14 @@ if __name__ == "__main__":
     spin_up_years = 5  # Number of years to spin up the model
     simulation_length_years = 5  # Set the length of the simulation
 
+    # set the isotopic initial conditions for the mixed layer box
+    d13C_ocean = 1  # per mil
+    D14C_ocean = 0  # per mil
+
     num_steps = 365 * (spin_up_years+simulation_length_years)  # Number of steps for output calculation
 
     # Load seasonal forcings
     temperature, salinity = load_seasonal_forcings(spin_up_years+simulation_length_years)  # Load for one year
-
-    d13C_ocean = 1  # per mil
-    D14C_ocean = 0  # per mil
 
     # Initialize the model with realistic forcings
     model_instance = MixedLayerModel(d13C_ocean=d13C_ocean, D14C_ocean=D14C_ocean, temp_celsius=temperature, salinity=salinity)

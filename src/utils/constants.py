@@ -17,8 +17,6 @@ WIND_SPEED_SUMMER = 7.0  # m/s
 WIND_SPEED_WINTER = 10.5  # m/s
 
 # Gas Exchange Parameters
-# Lynch-Steiglitz uses this -> PISTON_VELOCITY = 0.067  # mol m^-2 yr^-1 atm^-1 (from Stocker 1994 and Broecker 1985)
-
 # Calculate K0 (Henry's constant for CO2 solubility in mol/kg-sw/atm) as a function of temperature and salinity
 # Weiss, R. F., Marine Chemistry 2:203-215, 1974.
 # This is in mol/kg-SW/atm.

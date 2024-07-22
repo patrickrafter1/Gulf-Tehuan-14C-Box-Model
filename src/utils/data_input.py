@@ -1,8 +1,5 @@
 import PyCO2SYS as pyco2
 import numpy as np
-import utils.constants as constants
-
-import numpy as np
 
 def load_seasonal_forcings(simulation_length_years):
     """

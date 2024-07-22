@@ -1,9 +1,8 @@
 import pandas as pd
 import os
-import utils.data_input as data_input
 import PyCO2SYS as pyco2
 
-def save_output_to_file(time, output, label):
+def save_output_to_file(time, output, label, salinity, temperature):
     """
     Save computed chemical properties to a file.
 
@@ -19,11 +18,13 @@ def save_output_to_file(time, output, label):
             "ALK": output[1],
             "d13C": output[2] / output[0],
             "D14C": output[3] / output[0],
+            "salinity": salinity,
+            "temperature": temperature,
         }
     )
 
     current_directory = os.getcwd()
-    output_file_path = os.path.join(current_directory, f"data/model_output/{label}.txt")
+    output_file_path = os.path.join(current_directory, f"data/model_output/initial_conditions_{label}.txt")
 
     df.to_csv(output_file_path, sep="\t", float_format="%.2f", index=False)
     print(f"Output printed to '{output_file_path}'")
