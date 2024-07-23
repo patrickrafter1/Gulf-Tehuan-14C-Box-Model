@@ -161,4 +161,5 @@ cython_debug/
 plot_style.py
 font_setup.py
 .vscode/
-data/*
+data/model_output/*
+data/plots/*
