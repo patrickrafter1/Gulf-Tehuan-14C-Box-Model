@@ -34,6 +34,8 @@ def calculate_equilibrium_constants(temp, salt):
         + Tk * (sqrtS * 0.053105) + 148.0248 
         + sqrtS * (137.1942 + sqrtS * 1.62142)
     )
+    if Kb == 0.0:
+        Kb = 1e-6  # Assign a small value to prevent computational issues
 
     K1p = np.exp(
         115.525 - 4576.752 / Tk - 18.453 * np.log(Tk) 
@@ -162,6 +164,7 @@ def calculate_pco2_iteratively(tic, talk, temp=20.0, salt=35.0, po4=0.0, sio3=0.
     K12p = K1p * K2p
     K123p = K12p * K3p
     invKb = 1.0 / Kb
+
     invKs = 1.0 / Ks
     invKsi = 1.0 / Ksi
 
