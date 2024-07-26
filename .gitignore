@@ -163,3 +163,7 @@ font_setup.py
 .vscode/
 data/model_output/*
 data/plots/*
+
+# Do not ignore these specific files
+!data/model_output/.gitkeep
+!data/plots/.gitkeep
