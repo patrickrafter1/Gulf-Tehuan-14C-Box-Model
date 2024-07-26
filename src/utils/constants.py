@@ -7,6 +7,11 @@ DEFAULT_SALINITY = 34.78
 # Total borate in mol/kg-sw following Uppstrom (1974)
 BORON_COEFFICIENT = 0.0004157 / 35
 
+# Atmospheric Properties
+ATMOSPHERIC_CO2 = 395  # ppm
+ATMOSPHERIC_d13C = -8  # per mil
+ATMOSPHERIC_D14C = 0  # per mil
+
 # Mixed Layer Properties
 MIXED_LAYER_DEPTH = 30  # meters
 SURFACE_AREA = 1  # m^2 
@@ -15,6 +20,26 @@ SWD = 1029  # Seawater density kg/m^3
 # Seasonal Wind Speeds
 WIND_SPEED_SUMMER = 7.0  # m/s
 WIND_SPEED_WINTER = 10.5  # m/s
+
+# Seasonal Vertical Mixing
+VERTICAL_MIXING_WINTER = 0.1  # 0.1 mmol m−3 DIC per day from Cai et al., 2020
+VERTICAL_MIXING_SUMMER = 0  # no summer mixing based on Cai et al., 2020
+
+# Seasonal Biology Flux
+BIOLOGY_FLUX_SUMMER = 0.1  # max flux of 0.1 mmol m−3 DIC per day from Cai et al., 2020
+BIOLOGY_FLUX_WINTER = 0.01  # 10% of summer flux 
+
+# Biology Parameters
+CACO3_FRAC = 0.07 # .07 CaCO3 fraction of NPP
+OFFSET_ORG = -22  # isotopic fractionation into organic matter
+OFFSET_CC = 2 # isotopic fractionation into CaCO3
+
+# Subsurface boundary conditions
+SUBSURFACE_DIC = 2200  # µmol/kg
+SUBSURFACE_ALK = 2400  # µmol/kg
+SUBSURFACE_SALINITY = 33  # PSU 
+SUBSURFACE_d13C = 1  # per mil - based on correspondance with Wei-Jun Cai
+SUBSURFACE_D14C = -100  # per mil - based on Rafter et al. 2022
 
 # Gas Exchange Parameters
 # Calculate K0 (Henry's constant for CO2 solubility in mol/kg-sw/atm) as a function of temperature and salinity

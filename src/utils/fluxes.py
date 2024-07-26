@@ -21,21 +21,34 @@ def calculate_equilibrium_constants(temp, salt):
     Returns:
         dict: A dictionary of equilibrium constants.
     """
-
+    # local variable definitions
     Tk = temp + 273.15
     sqrtS = np.sqrt(salt)
+    Tk = temp + 273.15
+    centiTk = 0.01 * Tk
+    invTk = 1.0 / Tk
+    logTk = np.log(Tk)
+    sqrtS = np.sqrt(salt)
+    SO4 = 19.924 * salt / (1000 - 1.005 * salt)
+    sqrtSO4 = np.sqrt(SO4)
+    scl = salt / 1.80655
 
     K1 = 10.0 ** (62.008 - 3670.7 / Tk - 9.7944 * np.log(Tk) + salt * (0.0118 - salt * 0.000116))
     K2 = 10.0 ** (-4.777 - 1394.7 / Tk + salt * (0.0184 - salt * 0.000118))
+    
+    # warnings.filterwarnings("ignore", category=RuntimeWarning, message="divide by zero encountered in scalar divide")
 
     Kb = np.exp(
-        -8966.90 / Tk - sqrtS * (2890.53 + sqrtS * (77.942 - sqrtS * (1.728 - sqrtS * 0.0996))) 
-        - 24.4344 * np.log(Tk) + sqrtS * (25.085 + sqrtS * 0.2474) 
-        + Tk * (sqrtS * 0.053105) + 148.0248 
+        -invTk
+        * (
+            8966.90
+            + sqrtS * (2890.53 + sqrtS * (77.942 - sqrtS * (1.728 - sqrtS * 0.0996)))
+        )
+        - logTk * (24.4344 + sqrtS * (25.085 + sqrtS * 0.2474))
+        + Tk * (sqrtS * 0.053105)
+        + 148.0248
         + sqrtS * (137.1942 + sqrtS * 1.62142)
     )
-    if Kb == 0.0:
-        Kb = 1e-6  # Assign a small value to prevent computational issues
 
     K1p = np.exp(
         115.525 - 4576.752 / Tk - 18.453 * np.log(Tk) 
@@ -53,9 +66,12 @@ def calculate_equilibrium_constants(temp, salt):
     )
 
     Ksi = np.exp(
-        117.385 - 8904.2 / Tk - 19.334 * np.log(Tk) 
-        + sqrtS * (3.5913 - 458.79 / Tk) 
-        - salt * (1.5998 - 188.74 / Tk) - salt * (0.07871 - 12.1652 / Tk)
+        117.385
+        - invTk * 8904.2
+        - logTk * 19.334
+        + sqrtSO4 * (3.5913 - invTk * 458.79)
+        - SO4 * (1.5998 - invTk * 188.74 - SO4 * (0.07871 - invTk * 12.1652))
+        + np.log(1.0 - 0.001005 * salt)
     )
 
     Kw = np.exp(
@@ -65,18 +81,23 @@ def calculate_equilibrium_constants(temp, salt):
     )
 
     Ks = np.exp(
-        141.328 - 4276.1 / Tk - 23.093 * np.log(Tk) 
-        + sqrtS * (324.57 - 13856.0 / Tk - 47.986 * np.log(Tk)) 
-        - salt * (771.54 - 35474.0 / Tk - 114.723 * np.log(Tk))
+        141.328
+        - invTk * 4276.1
+        - logTk * 23.093
+        +  sqrtSO4* (324.57 - invTk * 13856.0 - logTk * 47.986 - SO4 * invTk * 2698.0)
+        - SO4 * (771.54 - invTk * 35474.0 - logTk * 114.723 - SO4 * invTk * 1776.0)
+        + np.log(1.0 - 0.001005 * salt)
     )
 
     Kf = np.exp(
-        -12.641 + 1590.2 / Tk + sqrtS * 1.525 
-        + np.log(1.0 - 0.001005 * salt) 
-        + np.log(1.0 + 0.1400 * salt / (96.062 * Ks))
+        -12.641
+        + invTk * 1590.2
+        + sqrtSO4 * 1.525
+        + np.log(1.0 - 0.001005 * salt)
+        + np.log(1.0 + 0.1400 * scl / (96.062 * Ks))
     )
 
-    return {
+    constants = {
         "K1": K1,
         "K2": K2,
         "Kb": Kb,
@@ -88,6 +109,8 @@ def calculate_equilibrium_constants(temp, salt):
         "Ks": Ks,
         "Kf": Kf,
     }
+
+    return constants
 
 def h_total(
     H, K1, K1p, K12, K12p, K123p, Kf, Ks, Kw, invKb, invKs, invKsi, alk, borate, dic, fluoride, phos, sili, sulfate
@@ -115,18 +138,14 @@ def h_total(
     )
     return res
 
-def calculate_pco2_iteratively(tic, talk, temp=20.0, salt=35.0, po4=0.0, sio3=0.0):
+def calculate_pco2_iteratively(tic, talk, temp, salt, po4=0.0, sio3=0.0):
     """
     This routine computes equilibrium partial pressure of CO2 (pCO2) in the surface seawater.
     """
     # local variable definitions
     Tk = temp + 273.15
     centiTk = 0.01 * Tk
-    invTk = 1.0 / Tk
-    logTk = np.log(Tk)
-    sqrtS = np.sqrt(salt)
     SO4 = 19.924 * salt / (1000 - 1.005 * salt)
-    sqrtSO4 = np.sqrt(SO4)
     scl = salt / 1.80655
 
     # converting from umol/kg or mmol/m3 to mol/kg
@@ -216,7 +235,7 @@ def calculate_pco2_iteratively(tic, talk, temp=20.0, salt=35.0, po4=0.0, sio3=0.
     phik = -np.log10(H)
     pco2 = co2starik * 1000000.0 / ff
 
-    return pco2
+    return pco2, phik, omega_aragik
 
 def calculate_pco2_func(current_state, temp_celsius, salinity, use_pyco2sys=False):
     """
@@ -246,8 +265,10 @@ def calculate_pco2_func(current_state, temp_celsius, salinity, use_pyco2sys=Fals
             salinity=salinity,
         )
         pco2_ocean = carbon_chemistry["pCO2"]
+        pH = carbon_chemistry["pH"]
+        omega = carbon_chemistry["saturation_aragonite"]
     else:
-        pco2_ocean = calculate_pco2_iteratively(dic_umolkg, alk_umolkg, temp_celsius, salinity)
+        pco2_ocean, pH, omega = calculate_pco2_iteratively(dic_umolkg, alk_umolkg, temp_celsius, salinity)
 
     return pco2_ocean
 
@@ -281,7 +302,7 @@ def gas_exchange(
         wind_speed = constants.WIND_SPEED_SUMMER
     
     # Calculate pCO2 of the ocean using the previously defined function
-    pco2_ocean = calculate_pco2_func(current_state, temp_celsius, salinity)
+    pco2_ocean = calculate_pco2_func(current_state, temp_celsius, salinity,use_pyco2sys=False)
 
     # Other variables
     d13C_ocean = current_state[2] / current_state[0]  # ppmil
@@ -303,9 +324,10 @@ def gas_exchange(
 
     # Calculate piston velocity based on wind speed and temperature
     piston_velocity = constants.piston_velocity(wind_speed, temp_celsius, salinity)
+    piston_velocity_year = piston_velocity  # mol/(m²·yr·atm)
 
-    SeatoAir = piston_velocity * pco2_ocean * surface_area  # mol yr-1
-    AirtoSea = piston_velocity * pco2_atm * surface_area  # mol yr-1
+    SeatoAir = piston_velocity_year * pco2_ocean * surface_area  # mol yr-1
+    AirtoSea = piston_velocity_year * pco2_atm * surface_area  # mol yr-1
 
     fract_sa_c13 = eq_frac_sa_c13_permil + kinetic_frac_c13_permil
     fract_as_c13 = eq_frac_as_c13_permil + kinetic_frac_c13_permil
@@ -322,7 +344,7 @@ def gas_exchange(
 
     return d_dt
 
-def vertical_mixing(num_tracers, day_of_year):
+def vertical_mixing(current_state, num_tracers, day_of_year):
     """
     Calculate mixing fluxes. 
     Values based on Cai, WJ., Xu, YY., Feely, R.A. et al. Controls on surface water carbonate chemistry along North American ocean margins. Nat Commun 11, 2691 (2020). https://doi.org/10.1038/s41467-020-16530-z
@@ -339,19 +361,17 @@ def vertical_mixing(num_tracers, day_of_year):
     """
     # Determine the mixing rate based on day of the year
     if day_of_year < 79 or day_of_year > 273:  # Winter period (October through February)
-        mixing_flux = 0.1 * 365 # winter mixing µmol/kg/day
+        fractional_mixing = constants.VERTICAL_MIXING_WINTER / current_state[0] # per day
     else:  # Summer period (March through September)
-        mixing_flux = 0
-
-    d13C_subsurface = 1  # per mil - based on correspondance with Wei-Jun Cai
-    D14C_subsurface = -100  # per mil - based on Rafter et al. 2022
+        fractional_mixing = constants.VERTICAL_MIXING_SUMMER / current_state[0] # per day
 
     # Calculate the mixing fluxes
     d_dt = np.zeros((num_tracers))
-    d_dt[0] += mixing_flux
-    d_dt[1] += mixing_flux
-    d_dt[2] += mixing_flux * d13C_subsurface
-    d_dt[3] += mixing_flux * D14C_subsurface
+    d_dt[0] += (fractional_mixing * constants.SUBSURFACE_DIC) - (fractional_mixing * current_state[0])
+    d_dt[1] += (fractional_mixing * constants.SUBSURFACE_ALK) - (fractional_mixing * current_state[1])
+    d_dt[2] += (fractional_mixing * constants.SUBSURFACE_d13C * constants.SUBSURFACE_DIC) - (fractional_mixing * current_state[2])
+    d_dt[3] += (fractional_mixing * constants.SUBSURFACE_D14C * constants.SUBSURFACE_DIC) - (fractional_mixing * current_state[3])
+    # d_dt[4] += (mixing_percentage * constants.SUBSURFACE_SALINITY) - (mixing_percentage * current_state[4])
 
     return d_dt
 
@@ -372,34 +392,64 @@ def biology(current_state, num_tracers, day_of_year):
     """
     # Seasonal biological production flux (µmol/kg/day)
     if 79 <= day_of_year <= 273:  # Productive season (March through September)
-        biology_flux = 0.1 * 365 # µmol/kg/day DIC
+        fractional_biology = constants.BIOLOGY_FLUX_SUMMER / current_state[0] # per day
     else:  # Non-productive season (October through February)
-        biology_flux = 0.01 * 365  # µmol/kg/day DIC
+        fractional_biology = constants.BIOLOGY_FLUX_WINTER / current_state[0] # per day
 
-    CaCO3_frac = 0.07 # .07 CaCO3 fraction of NPP
-    offset_org = -20  # isotopic fractionation into organic matter
-    offset_cc = -2 # isotopic fractionation into CaCO3
-
+    # TODO CURRENTLY NO RESPIRATION ! Look into this later
 
     current_d13C_ocean = current_state[2] / current_state[0]
-    d13C_org = current_d13C_ocean + offset_org
-    d13C_cc = current_d13C_ocean + offset_cc
+    d13C_org = current_d13C_ocean + constants.OFFSET_ORG
+    d13C_cc = current_d13C_ocean + constants.OFFSET_ORG
     current_D14C_ocean = current_state[3] / current_state[0]
-    D14C_org = current_D14C_ocean + 2 * offset_org
-    D14C_cc = current_D14C_ocean + 2 * offset_cc
+    D14C_org = current_D14C_ocean + 2 * constants.OFFSET_ORG
+    D14C_cc = current_D14C_ocean + 2 * constants.OFFSET_CC
 
-    carbonate_pump = biology_flux * CaCO3_frac
+    carbonate_pump = fractional_biology * constants.CACO3_FRAC
 
     d_dt = np.zeros((num_tracers))
 
     # Soft tissue pump
-    d_dt[0] -= biology_flux
-    d_dt[2] -= (biology_flux - carbonate_pump) * d13C_org
-    d_dt[3] -= (biology_flux - carbonate_pump) * D14C_org
+    d_dt[0] -= fractional_biology * current_state[0]
+    d_dt[2] -= (fractional_biology - carbonate_pump) * current_state[0] * d13C_org
+    d_dt[3] -= (fractional_biology - carbonate_pump) * current_state[0] * D14C_org
 
     # Carbonate pump
-    d_dt[1] -= carbonate_pump * 2
-    d_dt[2] -= carbonate_pump * d13C_cc
-    d_dt[3] -= carbonate_pump * D14C_cc
+    d_dt[1] -= carbonate_pump * current_state[1] * 2
+    d_dt[2] -= carbonate_pump * current_state[0] * d13C_cc
+    d_dt[3] -= carbonate_pump * current_state[0] * D14C_cc
+
+    return d_dt
+
+def dilution(current_state, num_tracers, day_of_year, salinity_forcing):
+    """
+    dilution factor defined as the ratio of current salinity divided by salinity forcing
+    """
+    # does the salinity tracer already take this into account?
+    fractional_mixing = constants.VERTICAL_MIXING_WINTER / current_state[0] # per day
+    salinity_change_due_to_mixing = (fractional_mixing * constants.SUBSURFACE_SALINITY) - (fractional_mixing * current_state[4])
+    # if > 1, salinity is increasing (no dilution), if < 1, salinity is decreasing (dilution)
+    current_salinity = current_state[4] + salinity_change_due_to_mixing
+    new_salinity = salinity_forcing
+    dilution_factor = new_salinity / current_salinity
+    # print(f"Salinity: {current_salinity}, Salinity forcing: {new_salinity}, Dilution factor: {dilution_factor}")
+
+    # print current states
+    # print(f"DIC is {current_state[0]}, ALK is {current_state[1]}, d13C is {current_state[2]/current_state[0]}, D14C is {current_state[3]/current_state[0]}")
+    # dilution_factor = 1 / (current_state[4] / salinity_forcing)
+    # 1 / dilution_factor = salinity_forcing / current_state[4]
+
+    # not yet incorpoating vertical mixing
+    # updated_salinity = dilution_factor * current_state[4]
+    # check if updated salinity = new salinity
+    # print(f"Updated salinity: {updated_salinity}, New salinity: {new_salinity}")
+
+    # Calculate the change in concentration due to dilution
+    d_dt = np.zeros((num_tracers))
+    d_dt[0] += (dilution_factor * current_state[0]) - current_state[0]
+    d_dt[1] += (dilution_factor * current_state[1]) - current_state[1]
+    d_dt[2] += (dilution_factor * current_state[2]) - current_state[2]
+    d_dt[3] += (dilution_factor * current_state[3]) - current_state[3]
+    d_dt[4] += (dilution_factor * current_state[4]) - current_state[4]
 
     return d_dt

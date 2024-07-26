@@ -3,17 +3,15 @@ import numpy as np
 from . import data_output
 import os
 
-def plot_variables(time, DIC, ALK, d13C, temp_celsius, salinity,spin_up_time, title="Model results"):
+def plot_variables(time, output, temp_celsius, salinity, title="Model results"):
     """
     Plot the variables temperature, salinity, pCO2, pH, DIC, and d13C over time.
 
     Parameters:
     - time: Array of time values
-    - DIC: Array of DIC values (µmol / kg)
-    - ALK: Array of ALK values (µmol / kg)
-    - d13C: Array of d13C values (per mil)
-    - temp_celsius: Array of temperature values (°C)
-    - salinity: Array of salinity values (PSU)
+    - ouput: matrix of model output (µmol / kg)
+    - temp_celsius: Array of temperature forcing (°C)
+    - salinity: Array of salinity forcing (PSU) 
     - title: Title of the plot
     """
     # Extend temperature and salinity to match the time length
@@ -25,19 +23,25 @@ def plot_variables(time, DIC, ALK, d13C, temp_celsius, salinity,spin_up_time, ti
     extended_temperature = extended_temperature[:len(time)]
     extended_salinity = extended_salinity[:len(time)]
 
-    carb_chem = data_output.compute_carbonate_system(DIC, ALK, extended_temperature, extended_salinity)
+    # DIC, ALK, and d13C from model output
+    DIC = output[0]
+    ALK = output[1]
+    d13C = output[2] / output[0]
 
+    # Calculate carbonate system variables from PyCO2SYS
+    carb_chem = data_output.compute_carbonate_system(DIC, ALK, extended_temperature, extended_salinity)
     pCO2 = carb_chem["pCO2"]
     pH = carb_chem["pH"]
     omega = carb_chem["omega"]
 
-    fig, axs = plt.subplots(4, 1, figsize=(14, 12), sharex=True)
+    fig, axs = plt.subplots(4, 1, figsize=(6, 11), sharex=True)
 
     # Temperature and Salinity
     ax1 = axs[0]
     ax1.plot(time, extended_salinity, label="Salinity", color='blue')
     ax1.set_ylabel("SSS", color='blue')
     ax1.tick_params(axis='y', labelcolor='blue')
+    ax1.set_ylim(32.5,34)
     for tl in ax1.get_yticklabels():
         tl.set_color('blue')
 
@@ -45,6 +49,7 @@ def plot_variables(time, DIC, ALK, d13C, temp_celsius, salinity,spin_up_time, ti
     ax2.plot(time, extended_temperature, label="Temperature °C", color='red')
     ax2.set_ylabel("SST (°C)", color='red')
     ax2.tick_params(axis='y', labelcolor='red')
+    ax2.set_ylim(0, 30)
     for tl in ax2.get_yticklabels():
         tl.set_color('red')
 
@@ -52,6 +57,7 @@ def plot_variables(time, DIC, ALK, d13C, temp_celsius, salinity,spin_up_time, ti
     ax3 = axs[1]
     ax3.plot(time, pCO2, label="pCO2 µatm", color='blue')
     ax3.set_ylabel("${p}$CO$_2$ (µatm)", color='blue')
+    ax3.set_ylim(300, 800)
     ax3.tick_params(axis='y', labelcolor='blue')
     for tl in ax3.get_yticklabels():
         tl.set_color('blue')
@@ -60,6 +66,7 @@ def plot_variables(time, DIC, ALK, d13C, temp_celsius, salinity,spin_up_time, ti
     ax4.plot(time, pH, label="pH", color='red')
     ax4.set_ylabel("pH", color='red')
     ax4.tick_params(axis='y', labelcolor='red')
+    ax4.set_ylim(7.8, 8.1)
     for tl in ax4.get_yticklabels():
         tl.set_color('red')
 
@@ -68,6 +75,7 @@ def plot_variables(time, DIC, ALK, d13C, temp_celsius, salinity,spin_up_time, ti
     ax5.plot(time, DIC, label="DIC µmol / kg", color='blue')
     ax5.set_ylabel("DIC µmol kg$^{-1}$", color='blue')
     ax5.tick_params(axis='y', labelcolor='blue')
+    ax5.set_ylim(1960,2120)
     for tl in ax5.get_yticklabels():
         tl.set_color('blue')
 
@@ -75,6 +83,7 @@ def plot_variables(time, DIC, ALK, d13C, temp_celsius, salinity,spin_up_time, ti
     ax6.plot(time, omega, label="Ω", color='red')
     ax6.set_ylabel("Ω$_{arag}$", color='red')
     ax6.tick_params(axis='y', labelcolor='red')
+    ax6.set_ylim(1.3, 2.7)
     for tl in ax6.get_yticklabels():
         tl.set_color('red')
 
@@ -86,18 +95,26 @@ def plot_variables(time, DIC, ALK, d13C, temp_celsius, salinity,spin_up_time, ti
     for tl in ax7.get_yticklabels():
         tl.set_color('blue')
 
-
     # Custom x-axis labels
-    num_ticks = (num_years) * 2 + 1  # For Jan, Jun each year
-    # tick_positions = np.linspace(spin_up_time, num_years+spin_up_time, num_ticks)
-    tick_positions = np.linspace(0, num_years, num_ticks)
+    tick_positions = []
     tick_labels = []
     for year in range(num_years):
-        tick_labels.append(f'January of year {year+1}')
-        tick_labels.append('')
-    tick_labels.append(f'January of year {num_years+1}')
-    
-    plt.xticks(tick_positions, tick_labels, rotation=45, ha='right')
+        for month in ["Jan", "Apr", "Jul", "Oct"]:
+            tick_positions.append(year + (["Jan", "Apr", "Jul", "Oct"].index(month) / 4))
+            tick_labels.append(month)
+    tick_positions.append(num_years)
+    tick_labels.append("Jan")
+
+    ax7.set_xticks(tick_positions)
+    ax7.set_xticklabels(tick_labels, rotation=45, ha='right')
+
+    # Set x-axis limit to end at the second April
+    ax7.set_xlim([0, 1 + 1/3])
+
+    # Add vertical grid lines for each tick
+    for pos in tick_positions:
+        for ax in axs:
+            ax.axvline(pos, color='gray', linestyle='-', linewidth=0.5)
 
     # Title and labels
     ax1.set_title(title)

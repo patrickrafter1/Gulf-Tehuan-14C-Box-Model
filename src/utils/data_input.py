@@ -1,5 +1,45 @@
 import PyCO2SYS as pyco2
 import numpy as np
+import pandas as pd 
+import os
+
+def load_real_data(prefix, simulation_length_years):
+    """
+    Load and process real data for temperature and salinity from a .h5 file.
+
+    Parameters:
+    - prefix (str): Prefix for the columns containing temperature and salinity data.
+    - simulation_length_years (int): Total number of years for the simulation.
+
+    Returns:
+    - temperature (array): Temperature profile (°C) for each day of the simulation period.
+    - salinity (array): Salinity profile (PSU) for each day of the simulation period.
+    """
+    def loop_years(vec):
+        slope = np.linspace(0, (vec[0] - vec[364]), 365)
+        vec = vec + slope
+        return np.hstack((vec, vec))
+
+    # Define the data directory and file path
+    DATADIR = os.path.join(os.path.dirname(__file__), "indata")
+    file_path = os.path.join(DATADIR, "mercator_tseries.h5")
+
+    # Load the .h5 file into a DataFrame
+    df = pd.read_hdf(file_path)
+
+    # Extract temperature and salinity data and process
+    temp_data = loop_years(df[prefix + "temp"][:365].values)
+    salt_data = loop_years(df[prefix + "salt"][:365].values)
+
+    # Repeat profiles for the total simulation length
+    total_days = simulation_length_years * 365
+    temperature = np.tile(temp_data, (total_days // 365) + 1)[:total_days]
+    salinity = np.tile(salt_data, (total_days // 365) + 1)[:total_days]
+
+    return temperature, salinity
+
+
+
 
 def load_seasonal_forcings(simulation_length_years):
     """
@@ -18,15 +58,15 @@ def load_seasonal_forcings(simulation_length_years):
 
     # Generate temperature profile for one year
     temp_mean = 15  # Mean temperature
-    temp_amplitude = 8  # Amplitude of temperature variation
-    temp_phase_shift = -52  # Phase shift to align with peak temperature in late August (day 240)
+    temp_amplitude = 7.5  # Amplitude of temperature variation to match the figure
+    temp_phase_shift = 180  # Phase shift to align with peak temperature in late August
     temperature_one_year = temp_mean + temp_amplitude * np.sin(2 * np.pi * (days - temp_phase_shift) / days_in_year)
 
     # Generate salinity profile for one year
     sal_mean = 33.5  # Mean salinity
-    sal_amplitude = 0.5  # Amplitude of salinity variation
-    sal_phase_shift = 180 - 31  # Phase shift to align with minimum salinity in July (day 180)
-    salinity_one_year = sal_mean + sal_amplitude * np.sin(2 * np.pi * (days - sal_phase_shift) / days_in_year)
+    sal_amplitude = 0.5  # Amplitude of salinity variation to match the figure
+    sal_phase_shift = 31  # Phase shift to align with minimum salinity in July
+    salinity_one_year = sal_mean + sal_amplitude * np.sin(2 * np.pi * (days + sal_phase_shift) / days_in_year)
     
     # Repeat profiles for the total simulation length
     total_days = simulation_length_years * days_in_year

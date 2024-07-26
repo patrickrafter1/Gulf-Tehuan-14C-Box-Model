@@ -42,30 +42,32 @@ class MixedLayerModel:
         - temp_celsius (array-like): Time-varying temperature in Celsius
         - salinity (array-like): Time-varying salinity
         """
-        self.num_tracers = 4
+        self.num_tracers = 5
         self.surface_area = constants.SURFACE_AREA  # m^2
         self.surface_volume = self.surface_area * constants.MIXED_LAYER_DEPTH  # m^3
         self.surface_mass = self.surface_volume * constants.SWD  # kg
 
         self.temp_celsius = np.array(temp_celsius)
         self.temp_kelvin = self.temp_celsius + 273.15
-        self.salinity = np.array(salinity)
+        self.salinity_forcing = np.array(salinity)
+        self.salinity = self.salinity_forcing[0]
 
-        self.CO2_atm = 395  # ppm
-        self.d13C_atm = -8  # per mil
-        self.D14C_atm = 0  # per mil
+        self.CO2_atm = constants.ATMOSPHERIC_CO2  # ppm
+        self.d13C_atm = constants.ATMOSPHERIC_d13C  # per mil
+        self.D14C_atm = constants.ATMOSPHERIC_D14C  # per mil
 
-        self.alkalinity = data_input.calc_talk(self.salinity[0], pref="se")
+        self.alkalinity = data_input.calc_talk(self.salinity_forcing[0], pref="ne")
         
         initial_carbonate_system = data_input.compute_initial_conditions(
-            pCO2=self.CO2_atm, alk=self.alkalinity, temp=self.temp_celsius[0], sal=self.salinity[0]
+            pCO2=self.CO2_atm, alk=self.alkalinity, temp=self.temp_celsius[0], sal=self.salinity_forcing[0]
         )
 
         self.DIC = initial_carbonate_system["dic"] # µmol/kg
-
         self.del_13C = 1 * self.DIC # delta * concenration tracer units
         self.del_14C = 0 * self.DIC # delta * concenration tracer units
-        self.initial_state = np.hstack((self.DIC, self.alkalinity, self.del_13C, self.del_14C))
+
+        self.pco2_ocean = self.CO2_atm  # µatm
+        self.initial_state = np.hstack((self.DIC, self.alkalinity, self.del_13C, self.del_14C,self.salinity))
 
         self.result = None
         self.time = None
@@ -99,14 +101,13 @@ class MixedLayerModel:
         """
         day_of_year = self.calculate_day_of_year(time)
         current_temp_celsius = np.interp(day_of_year, np.arange(len(self.temp_celsius)), self.temp_celsius)
-        current_salinity = np.interp(day_of_year, np.arange(len(self.salinity)), self.salinity)
+        current_salinity = np.interp(day_of_year, np.arange(len(self.salinity_forcing)), self.salinity_forcing)
 
-        # Print time only once per year
         current_year = int(time)+1
         if self.last_printed_year is None or current_year > self.last_printed_year:
             print(f"Year: {time:.2f}")
             self.last_printed_year = current_year  
-
+    
         d_dt = np.zeros((self.num_tracers))
         
         # Air-Sea Gas Exchange
@@ -124,14 +125,18 @@ class MixedLayerModel:
         )
         
         # Mixing
-        d_dt_mixing = fluxes.vertical_mixing(num_tracers=self.num_tracers, day_of_year=day_of_year)
+        d_dt_mixing = fluxes.vertical_mixing(current_state=state_vector, num_tracers=self.num_tracers, day_of_year=day_of_year)
         
         # Biology
         d_dt_biology = fluxes.biology(current_state=state_vector, num_tracers=self.num_tracers, day_of_year=day_of_year)
         
+        # Dilution
+        d_dt_dilution = fluxes.dilution(current_state=state_vector, num_tracers=self.num_tracers, day_of_year=day_of_year, salinity_forcing=current_salinity)
+        
         d_dt += d_dt_mixing
         d_dt += d_dt_biology
         d_dt += d_dt_gasexchange
+        d_dt += d_dt_dilution
 
         return d_dt
 
@@ -172,28 +177,28 @@ class MixedLayerModel:
             self.time = self.time[spin_up_steps:] - spin_up_time
             self.output = self.output[:, spin_up_steps:]
             self.temp_celsius = self.temp_celsius[spin_up_steps:]
-            self.salinity = self.salinity[spin_up_steps:]
+            self.salinity_forcing = self.salinity_forcing[spin_up_steps:]
 
-        # Save the output to file
         data_output.save_output_to_file(
             time=self.time,
             output=self.output,
-            salinity=self.salinity,
-            temperature=self.temp_celsius,
+            salinity=constants.DEFAULT_SALINITY,
+            temperature=constants.DEFAULT_TEMP_CELSIUS,
         )
 
 
 if __name__ == "__main__":
     from utils.data_input import load_seasonal_forcings
+    from utils.data_input import load_real_data
     from utils.plotting import plot_variables
     
-    spin_up_years = 5  # Number of years to spin up the model
-    simulation_length_years = 5  # Set the length of the simulation
+    spin_up_years = 5  # Number of years to spin up  the model
+    simulation_length_years = 2  # Set the length of the simulation
 
     num_steps = 365 * (spin_up_years+simulation_length_years)  # Number of steps for output calculation
 
-    # Load seasonal forcings
-    temperature, salinity = load_seasonal_forcings(spin_up_years+simulation_length_years)  # Load for one year
+    # Load temp and salinity forcings for the North Atlantic outside Gulf of Maine based on Fig 6 in Cei et al. 2020
+    temperature,salinity = load_real_data('ne', spin_up_years+simulation_length_years)
 
     # Initialize the model with realistic forcings
     model_instance = MixedLayerModel(temp_celsius=temperature, salinity=salinity)
@@ -202,10 +207,7 @@ if __name__ == "__main__":
     # After running the model and saving output to file
     plot_variables(
         time=model_instance.time,   
-        DIC=model_instance.output[0],
-        ALK=model_instance.output[1],
-        d13C=model_instance.output[2]/model_instance.output[0],
+        output=model_instance.output,
         temp_celsius=model_instance.temp_celsius,
-        salinity=model_instance.salinity, 
-        spin_up_time=spin_up_years,
+        salinity=model_instance.salinity_forcing, 
     )

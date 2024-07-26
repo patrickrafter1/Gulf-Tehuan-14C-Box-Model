@@ -1,20 +1,29 @@
 # Idealized Mixed Layer Carbon Isotope Box Model
 
-Our idealized mixed layer carbon isotope enabled box model is based on the work by Lynch-Stieglitz et al. (1995):
-
-> Lynch-Stieglitz, J., T. F. Stocker, W. S. Broecker, and R. G. Fairbanks (1995), The influence of air-sea exchange on the isotopic composition of oceanic carbon: Observations and modeling, Global Biogeochem. Cycles, 9(4), 653–665, doi:10.1029/95GB02574.
-
-We have extended this model to include seasonal temperature and salinity forcing based on a sine wave, as well as seasonal wind speed (7 m/s from March through September and 10.5 m/s from October through February), vertical mixing (0.1 µmol kg⁻¹ day⁻¹ DIC from October through February), and biological production (0.1 µmol kg⁻¹ day⁻¹ DIC from March through September and 0.01 µmol kg⁻¹ day⁻¹ DIC for the rest of the year) parameterized based on the values used in Cai et al. (2020):
-
-> Cai, WJ., Xu, YY., Feely, R.A. et al. (2020). Controls on surface water carbonate chemistry along North American ocean margins. Nat Commun 11, 2691. https://doi.org/10.1038/s41467-020-16530-z.
-
 ### Model Description
 
-Our model simulates a generic water column from the mixed layer with a depth of 30 m, a surface area of 1 m² (values can be adjusted in 'constants.py' file), a fixed atmospheric pCO₂ of 395 μatm, and initial conditions set to achieve equilibrium with atmospheric values. The model includes state variables for dissolved inorganic carbon (DIC), alkalinity (ALK), δ13C-DIC, and Δ14C-DIC. It assumes chemical and isotopic equilibrium for all timescales relevant to our experiments, calculated using PyCO2SYS (Humphreys et al., 2022).
+Our model simulates a generic water column with a mixed layer depth of 30 m and a surface area of 1 m² (these values can be adjusted in the 'constants.py' file). The model assumes a fixed atmospheric pCO₂ of 395 μatm with a δ13C of -8‰ (these values can be adjusted in the constants.py file). It includes state variables for dissolved inorganic carbon (DIC; units µmol kg⁻¹), alkalinity (ALK; units µmol kg⁻¹), δ13C-DIC (δ notation, units per mil), and Δ14C-DIC (Δ notation, units per mil).
 
-Following Cai et al. 2020, the model is initiated with the carbonate system defined by pCO2 in equilibrium with atmospheric values and alkalinity defined by initial salinity. ΔDICBio and ΔDICVertical are prescribed while ΔpCO2_Air-Sea is calculated at each time step using the relationship ΔpCO2_Air-Sea = 0.24 * kappa * K0 * (pCO2_t(aq) - (pCO2_(atm)). K0 is the CO2 gas solubility and kappa is defined as kappa = 0.251 * W2 * (Sc/660)-0.5 where W is wind speed in m/s and Sc is the Schmidt number. Total alkalinity is calculated from prescribed salinity.
+The model is originally based on the work by Lynch-Stieglitz et al. (1995):
 
-Isotopic fractionation is considered using equilibrium and kinetic fractionation factors for δ13C and δ14C.
+> Lynch-Stieglitz, J., Stocker, T. F., Broecker, W. S., & Fairbanks, R. G. (1995). The influence of air-sea exchange on the isotopic composition of oceanic carbon: Observations and modeling. Global Biogeochemical Cycles, 9(4), 653–665. doi:10.1029/95GB02574
+
+It has been extended to include realistic forcings based on Cai et al. (2020):
+
+> Cai, W. J., Xu, Y. Y., Feely, R. A., et al. (2020). Controls on surface water carbonate chemistry along North American ocean margins. Nature Communications, 11, 2691. https://doi.org/10.1038/s41467-020-16530-z
+
+Temperature and salinity forcings are derived from the Mercator 1/12° data-assimilated General Circulation Model, with a daily resolution. Wind speed is prescribed seasonally: 7 m/s from March through September and 10.5 m/s from October through February. A fractional change in tracers due to vertical mixing is based on a 0.1 µmol kg⁻¹ day⁻¹ DIC flux used in Cai et al. (2020) and the current DIC concentration at each time step. This fractional flux is applied to all tracers during winter months (October through February) with no vertical mixing in summer. A similar approach is used for biological production, with a fractional flux of 0.1 µmol kg⁻¹ day⁻¹ DIC from March through September and 0.01 µmol kg⁻¹ day⁻¹ DIC for the rest of the year, based on maximum ΔDIC_bio (0.1 mmol C day⁻¹ m⁻³) from Cai et al. (2020).
+
+Biological processes influence the carbon isotopic composition of the ocean (e.g., Fontugne and Duplessy, 1978). During photosynthesis, organisms preferentially utilize ¹²C (the lighter carbon isotope), enriching the surface ocean in ¹³C and relatively enriching the underlying waters in ¹²C upon remineralization. We use a constant isotopic fractionation of -22‰ for photosynthesis (Toggweiler and Sarmiento, 1985; Vogel et al., 1970) and a small fractionation of +2‰ for calcium carbonate formation, following Jahn et al. (2015).
+
+We account for both kinetic and equilibrium isotopic fractionation during air-sea gas exchange. The kinetic fractionation factor for CO₂ transfer across the air-sea interface is set to -0.5‰, following Siegenthaler and Munnich (1981) and Zhang (1995). Equilibrium fractionation between atmospheric CO₂ and dissolved CO₂ in seawater is temperature-dependent, calculated using the fractionation factor \(\alpha_{\text{CO2}} = -0.373 / T_{\text{K}} + 1.00019\) (Vogel et al., 1970). The fractionation between dissolved CO₂ and \(\mathrm{HCO}_3^-\) in seawater, \(\alpha_{\text{HCO3}}\), is similarly temperature-dependent, calculated as \(\alpha_{\text{HCO3}} = -9.866 / T_{\text{K}} + 1.02412\). These fractionation factors (α) are converted to isotopic enrichment factors (ε) to correspond to the delta notation (units per mil) for δ13C tracers. Since the isotopic fractionation is approximately twice as large for ¹⁴C as for ¹³C (Zeebe and Wolf-Gladrow, 2001), all isotopic enrichment factors for ¹⁴C are doubled.
+
+Given that chemical and isotopic equilibrium occurs on a timescale of seconds (Zeebe et al., 1999), much faster than the years to decades required for air-sea equilibrium of CO₂ and carbon isotopes (Broecker and Peng, 1982; Schmittner et al., 2013), we assume our carbon species in the mixed layer are in chemical and isotopic equilibrium for all timescales relevant to our experiments.
+
+### Model Initiation and Iteration
+
+The model is spun up for 5 years to ensure a steady state of isotopic equilibrium with the atmosphere. It is initialized with a δ13C-DIC of 1‰ and a Δ14C of 0‰. Following Cai et al. (2020), the carbonate system is initialized with values calculated from PyCO2SYS (Humphreys et al., 2022) based on a pCO₂(aq) in equilibrium with atmospheric values (395 μatm) and alkalinity calculated with salinity. ΔDIC_bio and ΔDIC_vertical are prescribed as fractional changes (values mentioned above), while ΔpCO₂_air-sea is calculated at each time step using the relationship ΔpCO₂_air-sea = 0.24 * k * K₀ * (pCO₂_t(aq) - pCO₂_(atm)). K₀ is the CO₂ gas solubility (Weiss, 1974) and k is defined as 0.251 * W² * (Sc/660)⁻⁰·⁵, where W is wind speed in m/s and Sc is the Schmidt number (Wanninkhof, 1992; 2014). For ΔpCO₂_air-sea, pCO₂_t(aq) is calculated using an iterative CO₂ solver. At each time step, DIC_t+1 is updated based on ΔDIC_bio, ΔDIC_vertical, and ΔpCO₂_air-sea. At the end of the simulation, PyCO2SYS is used to back-calculate pCO₂, pH, and Ω_aragonite based on the model's DIC, ALK, and temperature and salinity forcing.
+
 
 ## Running the Model
 
@@ -24,26 +33,55 @@ To run the model, follow these steps:
 
     ```bash
     git clone https://github.com/RyanAGreen/mld-box-model-c-isotopes.git
-    cd mld-box-model-c-isotope
+    cd mld-box-model-c-isotopes
     ```
 
-2. **Install the required dependencies:**
+2. **Create and activate a virtual environment:**
+
+    - **Using `venv` (Python 3 standard library):**
+
+      ```bash
+      python3 -m venv mld-box-model
+      ```
+
+    - **Activate the virtual environment:**
+
+      - On Windows:
+
+        ```bash
+        .\mld-box-model\Scripts\activate
+        ```
+
+      - On macOS and Linux:
+
+        ```bash
+        source mld-box-model/bin/activate
+        ```
+
+3. **Install the required dependencies:**
 
     ```bash
     pip install -r requirements.txt
     ```
 
-3. **Adjust model parameters:**
+4. **Adjust model parameters:**
    
-  You can adjust the parameters in the `if __name__ == "__main__":` block of the `model.py` file to suit your needs. You can easily change the length of the simulation with `spin_up_years` and `simulation_length_years`, and you can change the initial conditions for the isotopes in the mixed layer box with `d13C_ocean` and `D14C_ocean`.
+    You can adjust the length of the experiment within the `if __name__ == "__main__":` block of the `model.py` file. You can also modify the mixed layer properties, atmospheric conditions, and the parameterized seasonal forcings within `src/utils/constants.py`.
 
-4. **Run the model:**
+5. **Run the model:**
 
     ```bash
     python src/model.py
     ```
+    An overview figure will be generated and saved as `model_results.png` in the `data/plots` directory. Additionally, a text file containing the model results will be saved as `model_results.txt` in the `data` directory for further analysis.
 
-An overview figure will be generated and saved in the `data/plots` directory. Additionally, a text file containing the model results will be saved in the `data` directory for further analysis.
+6. **Deactivate the virtual environment:**
+
+    When you're done working with the model, deactivate the virtual environment:
+
+    ```bash
+    deactivate
+    ```
 
 ## Code Structure
 
@@ -63,20 +101,12 @@ The table below explains the files and directories included in this project.
 | `src/utils/data_input.py` | Data input functions |
 | `src/utils/data_output.py` | Data output functions |
 | `src/utils/plotting.py` | Plotting functions |
+| `src/utils/indata/mercator_tseries.h5` | Temperature and salinity data |
 | `src/__init__.py` | Python package initialization file |
 | `notebooks` | Jupyter notebooks for analysis or examples |
 | `docs` | Additional documentation or research papers |
 | `examples` | Example scripts using the model |
 | `scripts` | Useful scripts for data preprocessing, visualization, etc. |
-
-## Adjusting the Model
-
-To adjust the model for your specific requirements, you can modify the parameters in the `src/model.py` file. Key parameters include:
-
-- `spin_up_years`: Number of years to run the model for spin-up.
-- `simulation_length_years`: Number of years for the actual simulation.
-- `d13C_ocean`: Initial δ13C of DIC in box model.
-- `D14C_ocean`: Initial ∆14C of DIC in box model.
 
 ## Output
 
@@ -90,10 +120,6 @@ Both outputs are designed for further data analysis and visualization.
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Contributing
-
-Contributions are welcome! Please read the [CONTRIBUTING](docs/CONTRIBUTING.md) guide to get started.
 
 ## Contact
 
