@@ -3,13 +3,35 @@ import numpy as np
 import pandas as pd 
 import os
 
-def load_real_data(prefix, simulation_length_years):
+def load_model_forcings(region, total_years):
+    """
+    Load temperature and salinity data for the model.
+    
+    Parameters:
+    - region (str): Region of the US East Coast. Options are:
+                  'se' (South Atlantic Bight),
+                  'me' (Mid Atlantic Bight),
+                  'ne' (North Atlantic outside Gulf of Maine)
+    - total_years (int): Total years of data needed.
+    
+    Returns:
+    - temperature (np.array): Array of temperature values.
+    - salinity (np.array): Array of salinity values.
+    """
+    temperature, salinity = load_real_data(region, total_years)
+    return temperature, salinity
+
+
+def load_real_data(region, total_years):
     """
     Load and process real data for temperature and salinity from a .h5 file.
 
     Parameters:
-    - prefix (str): Prefix for the columns containing temperature and salinity data.
-    - simulation_length_years (int): Total number of years for the simulation.
+    - region (str): Region of the US East Coast. Options are:
+                  'se' (South Atlantic Bight),
+                  'me' (Mid Atlantic Bight),
+                  'ne' (North Atlantic outside Gulf of Maine)
+    - total_years (int): Total number of years for the simulation.
 
     Returns:
     - temperature (array): Temperature profile (°C) for each day of the simulation period.
@@ -28,11 +50,11 @@ def load_real_data(prefix, simulation_length_years):
     df = pd.read_hdf(file_path)
 
     # Extract temperature and salinity data and process
-    temp_data = loop_years(df[prefix + "temp"][:365].values)
-    salt_data = loop_years(df[prefix + "salt"][:365].values)
+    temp_data = loop_years(df[region + "temp"][:365].values)
+    salt_data = loop_years(df[region + "salt"][:365].values)
 
     # Repeat profiles for the total simulation length
-    total_days = simulation_length_years * 365
+    total_days = total_years * 365
     temperature = np.tile(temp_data, (total_days // 365) + 1)[:total_days]
     salinity = np.tile(salt_data, (total_days // 365) + 1)[:total_days]
 

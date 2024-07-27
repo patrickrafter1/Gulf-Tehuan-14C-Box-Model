@@ -1,5 +1,9 @@
 import numpy as np
 
+# Experiment length
+DEFAULT_SIMULATION_LENGTH_YEARS = 2  # years
+DEFAULT_SPIN_UP_TIME = 5  # years
+
 # Constants
 DEFAULT_TEMP_CELSIUS = 20
 DEFAULT_TEMP_KELVIN = DEFAULT_TEMP_CELSIUS + 273.15
@@ -37,7 +41,6 @@ OFFSET_CC = 2 # isotopic fractionation into CaCO3
 # Subsurface boundary conditions
 SUBSURFACE_DIC = 2200  # µmol/kg
 SUBSURFACE_ALK = 2400  # µmol/kg
-SUBSURFACE_SALINITY = 33  # PSU 
 SUBSURFACE_d13C = 1  # per mil - based on correspondance with Wei-Jun Cai
 SUBSURFACE_D14C = -100  # per mil - based on Rafter et al. 2022
 

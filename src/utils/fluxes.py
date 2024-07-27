@@ -371,7 +371,6 @@ def vertical_mixing(current_state, num_tracers, day_of_year):
     d_dt[1] += (fractional_mixing * constants.SUBSURFACE_ALK) - (fractional_mixing * current_state[1])
     d_dt[2] += (fractional_mixing * constants.SUBSURFACE_d13C * constants.SUBSURFACE_DIC) - (fractional_mixing * current_state[2])
     d_dt[3] += (fractional_mixing * constants.SUBSURFACE_D14C * constants.SUBSURFACE_DIC) - (fractional_mixing * current_state[3])
-    # d_dt[4] += (mixing_percentage * constants.SUBSURFACE_SALINITY) - (mixing_percentage * current_state[4])
 
     return d_dt
 
@@ -421,35 +420,29 @@ def biology(current_state, num_tracers, day_of_year):
 
     return d_dt
 
-def dilution(current_state, num_tracers, day_of_year, salinity_forcing):
+def salinity_effects(current_state, num_tracers, day_of_year, salinity_forcing):
     """
-    dilution factor defined as the ratio of current salinity divided by salinity forcing
+    Calculate changes in tracer concentrations due to changes in salinity.
+
+    Parameters:
+    - current_state (array): Current state variables [DIC, ALK, d13C, D14C, Salinity]
+    - num_tracers (int): Number of tracers
+    - day_of_year (int): Day of the year
+    - salinity_forcing (float): New salinity value (PSU)
+
+    Returns:
+    - d_dt (array): Rate of change of tracers due to salinity changes
     """
-    # does the salinity tracer already take this into account?
-    fractional_mixing = constants.VERTICAL_MIXING_WINTER / current_state[0] # per day
-    salinity_change_due_to_mixing = (fractional_mixing * constants.SUBSURFACE_SALINITY) - (fractional_mixing * current_state[4])
-    # if > 1, salinity is increasing (no dilution), if < 1, salinity is decreasing (dilution)
-    current_salinity = current_state[4] + salinity_change_due_to_mixing
+    # Current and new salinity
+    current_salinity = current_state[4]
     new_salinity = salinity_forcing
+    
+    # Dilution factor
     dilution_factor = new_salinity / current_salinity
-    # print(f"Salinity: {current_salinity}, Salinity forcing: {new_salinity}, Dilution factor: {dilution_factor}")
-
-    # print current states
-    # print(f"DIC is {current_state[0]}, ALK is {current_state[1]}, d13C is {current_state[2]/current_state[0]}, D14C is {current_state[3]/current_state[0]}")
-    # dilution_factor = 1 / (current_state[4] / salinity_forcing)
-    # 1 / dilution_factor = salinity_forcing / current_state[4]
-
-    # not yet incorpoating vertical mixing
-    # updated_salinity = dilution_factor * current_state[4]
-    # check if updated salinity = new salinity
-    # print(f"Updated salinity: {updated_salinity}, New salinity: {new_salinity}")
-
-    # Calculate the change in concentration due to dilution
+    
+    # Changes in concentration due to salinity changes
     d_dt = np.zeros((num_tracers))
-    d_dt[0] += (dilution_factor * current_state[0]) - current_state[0]
-    d_dt[1] += (dilution_factor * current_state[1]) - current_state[1]
-    d_dt[2] += (dilution_factor * current_state[2]) - current_state[2]
-    d_dt[3] += (dilution_factor * current_state[3]) - current_state[3]
-    d_dt[4] += (dilution_factor * current_state[4]) - current_state[4]
-
+    for i in range(num_tracers):
+        d_dt[i] = (dilution_factor * current_state[i]) - current_state[i]
+    
     return d_dt

@@ -66,7 +66,7 @@ To run the model, follow these steps:
 
 4. **Adjust model parameters:**
    
-    You can adjust the length of the experiment within the `if __name__ == "__main__":` block of the `model.py` file. You can also modify the mixed layer properties, atmospheric conditions, and the parameterized seasonal forcings within `src/utils/constants.py`.
+    You can also modify the experiment length, mixed layer properties, atmospheric conditions, the parameterized seasonal forcings, and all other parameters within `src/utils/constants.py`.
 
 5. **Run the model:**
 
@@ -103,10 +103,7 @@ The table below explains the files and directories included in this project.
 | `src/utils/plotting.py` | Plotting functions |
 | `src/utils/indata/mercator_tseries.h5` | Temperature and salinity data |
 | `src/__init__.py` | Python package initialization file |
-| `notebooks` | Jupyter notebooks for analysis or examples |
-| `docs` | Additional documentation or research papers |
-| `examples` | Example scripts using the model |
-| `scripts` | Useful scripts for data preprocessing, visualization, etc. |
+
 
 ## Output
 
