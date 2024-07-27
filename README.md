@@ -1,4 +1,4 @@
-# Idealized Mixed Layer Carbon Isotope Box Model
+# Carbon Isotope Enabled Box Model for an Idealized Surface Mixed Layer 
 
 ### Model Description
 
