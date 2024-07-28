@@ -2,8 +2,9 @@ import PyCO2SYS as pyco2
 import numpy as np
 import pandas as pd 
 import os
+from . import constants
 
-def load_model_forcings(region, total_years):
+def load_model_forcings(region):
     """
     Load temperature and salinity data for the model.
     
@@ -18,11 +19,11 @@ def load_model_forcings(region, total_years):
     - temperature (np.array): Array of temperature values.
     - salinity (np.array): Array of salinity values.
     """
-    temperature, salinity = load_real_data(region, total_years)
+    temperature, salinity = load_real_data(region)
     return temperature, salinity
 
 
-def load_real_data(region, total_years):
+def load_real_data(region):
     """
     Load and process real data for temperature and salinity from a .h5 file.
 
@@ -54,16 +55,15 @@ def load_real_data(region, total_years):
     salt_data = loop_years(df[region + "salt"][:365].values)
 
     # Repeat profiles for the total simulation length
-    total_days = total_years * 365
-    temperature = np.tile(temp_data, (total_days // 365) + 1)[:total_days]
-    salinity = np.tile(salt_data, (total_days // 365) + 1)[:total_days]
+    temperature = np.tile(temp_data, (constants.TOTAL_DAYS // 365) + 1)[:constants.TOTAL_DAYS]
+    salinity = np.tile(salt_data, (constants.TOTAL_DAYS // 365) + 1)[:constants.TOTAL_DAYS]
 
     return temperature, salinity
 
 
 
 
-def load_seasonal_forcings(simulation_length_years):
+def load_seasonal_forcings():
     """
     Load seasonal forcings for temperature and salinity for a given number of years with daily data.
     This function generates seasonal profiles for the US East Coast.
@@ -91,9 +91,9 @@ def load_seasonal_forcings(simulation_length_years):
     salinity_one_year = sal_mean + sal_amplitude * np.sin(2 * np.pi * (days + sal_phase_shift) / days_in_year)
     
     # Repeat profiles for the total simulation length
-    total_days = simulation_length_years * days_in_year
-    temperature = np.tile(temperature_one_year, simulation_length_years)
-    salinity = np.tile(salinity_one_year, simulation_length_years)
+    total_days = constants.TOTAL_YEARS * days_in_year
+    temperature = np.tile(temperature_one_year, constants.TOTAL_YEARS)
+    salinity = np.tile(salinity_one_year, constants.TOTAL_YEARS)
 
     return temperature, salinity
 

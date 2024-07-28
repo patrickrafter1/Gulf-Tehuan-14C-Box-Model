@@ -359,11 +359,14 @@ def vertical_mixing(current_state, num_tracers, day_of_year):
     Returns:
         tuple: Rate of change of tracers.
     """
+    # Current DIC concentration
+    current_dic = current_state[0]
+
     # Determine the mixing rate based on day of the year
     if day_of_year < 79 or day_of_year > 273:  # Winter period (October through February)
-        fractional_mixing = constants.VERTICAL_MIXING_WINTER / current_state[0] # per day
+        fractional_mixing = constants.VERTICAL_MIXING_WINTER / current_dic # per day
     else:  # Summer period (March through September)
-        fractional_mixing = constants.VERTICAL_MIXING_SUMMER / current_state[0] # per day
+        fractional_mixing = constants.VERTICAL_MIXING_SUMMER / current_dic # per day
 
     # Calculate the mixing fluxes
     d_dt = np.zeros((num_tracers))
@@ -376,47 +379,49 @@ def vertical_mixing(current_state, num_tracers, day_of_year):
 
 def biology(current_state, num_tracers, day_of_year):
     """
-    Calculate biological fluxes. Respiration is ignored.
-    Values based on Cai, WJ., Xu, YY., Feely, R.A. et al. Controls on surface water carbonate chemistry along North American ocean margins. Nat Commun 11, 2691 (2020). https://doi.org/10.1038/s41467-020-16530-z
+    Calculate biological fluxes, including export production and CaCO₃ dynamics.
 
     Parameters:
         current_state (array-like): Current state with DIC, TA, d13C, and D14C concentrations.
-        num_tracer (int): Number of tracers.
+        num_tracers (int): Number of tracers.
         day_of_year (int): Day of the year (1-365).
-        surface_area (float): Surface area of the mixed layer.
-        surface_mass (float): Surface mass of the mixed layer.
 
     Returns:
         array: Rate of change of tracers.
     """
-    # Seasonal biological production flux (µmol/kg/day)
+
+    # Current DIC concentration
+    current_dic = current_state[0]
+
+    # Seasonal NCP rate based on current DIC
     if 79 <= day_of_year <= 273:  # Productive season (March through September)
-        fractional_biology = constants.BIOLOGY_FLUX_SUMMER / current_state[0] # per day
+        ncp = constants.BIOLOGY_FLUX_SUMMER * current_dic
     else:  # Non-productive season (October through February)
-        fractional_biology = constants.BIOLOGY_FLUX_WINTER / current_state[0] # per day
+        ncp = constants.BIOLOGY_FLUX_WINTER * current_dic
+    
+    # Export production fraction (portion of NCP exported as POC)
+    poc_export = constants.EXPORT_FRACTION_POC * ncp
 
-    # TODO CURRENTLY NO RESPIRATION ! Look into this later
+    # CaCO₃ production (using rain ratio)
+    caco3_production = poc_export * constants.RAIN_RATIO
+    
+    # CaCO₃ dissolution rate (e.g., 38% per day)
+    caco3_dissolution = caco3_production * constants.CACO3_DISSOLUTION_RATE
 
-    current_d13C_ocean = current_state[2] / current_state[0]
+    current_d13C_ocean = current_state[2] / current_dic
     d13C_org = current_d13C_ocean + constants.OFFSET_ORG
-    d13C_cc = current_d13C_ocean + constants.OFFSET_ORG
-    current_D14C_ocean = current_state[3] / current_state[0]
+    d13C_cc = current_d13C_ocean + constants.OFFSET_CC
+    current_D14C_ocean = current_state[3] / current_dic
     D14C_org = current_D14C_ocean + 2 * constants.OFFSET_ORG
     D14C_cc = current_D14C_ocean + 2 * constants.OFFSET_CC
 
-    carbonate_pump = fractional_biology * constants.CACO3_FRAC
-
     d_dt = np.zeros((num_tracers))
 
-    # Soft tissue pump
-    d_dt[0] -= fractional_biology * current_state[0]
-    d_dt[2] -= (fractional_biology - carbonate_pump) * current_state[0] * d13C_org
-    d_dt[3] -= (fractional_biology - carbonate_pump) * current_state[0] * D14C_org
-
-    # Carbonate pump
-    d_dt[1] -= carbonate_pump * current_state[1] * 2
-    d_dt[2] -= carbonate_pump * current_state[0] * d13C_cc
-    d_dt[3] -= carbonate_pump * current_state[0] * D14C_cc
+    # Update DIC and tracers due to POC remineralization and PIC dissolution
+    d_dt[0] += poc_export + caco3_dissolution  # Increase DIC due to POC export and CaCO₃ dissolution
+    d_dt[1] -= caco3_dissolution * 2  # Decrease alkalinity due to CaCO₃ dissolution
+    d_dt[2] += poc_export * d13C_org + caco3_dissolution * d13C_cc
+    d_dt[3] += poc_export * D14C_org + caco3_dissolution * D14C_cc
 
     return d_dt
 

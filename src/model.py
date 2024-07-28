@@ -47,6 +47,14 @@ class MixedLayerModel:
         self.surface_volume = self.surface_area * constants.MIXED_LAYER_DEPTH  # m^3
         self.surface_mass = self.surface_volume * constants.SWD  # kg
 
+        # Check if temp_celsius and salinity are scalar values (int or float)
+        if isinstance(temp_celsius, (int, float)):
+            print("Using constant temperature forcing.")
+            temp_celsius = np.full(constants.TOTAL_DAYS, temp_celsius)
+        if isinstance(salinity, (int, float)):
+            print("Using constant salinity forcing.")
+            salinity = np.full(constants.TOTAL_DAYS, salinity)
+        
         self.temp_celsius = np.array(temp_celsius) # Celsius
         self.temp_kelvin = self.temp_celsius + 273.15
         self.salinity_forcing = np.array(salinity)
@@ -204,8 +212,8 @@ class MixedLayerModel:
 
         return d_dt
 
-    def run_model(self, simulation_length_years=constants.DEFAULT_SIMULATION_LENGTH_YEARS, 
-                  num_steps=None, spin_up_time=constants.DEFAULT_SPIN_UP_TIME):
+    def run_model(self, total_years=constants.TOTAL_YEARS, 
+                  num_steps=constants.TOTAL_DAYS, spin_up_time=constants.DEFAULT_SPIN_UP_TIME):
         """
         Run the model with ODE solver giving initial_state as initial condition.
 
@@ -215,20 +223,17 @@ class MixedLayerModel:
         - spin_up_time (int): Number of years to exclude from the analysis (for model spin-up)
         """
 
-        if num_steps is None:
-            num_steps = 365 * (spin_up_time + simulation_length_years)
-
         start_time = time.time()
 
         # Set the times to store the computed solution
-        self.time = np.linspace(0, simulation_length_years, num_steps) # in days
+        self.time = np.linspace(0, total_years, num_steps) # in days
         
         print(f"Model spinning up for {spin_up_time} years...")
 
         # Solve the ODE
         self.result = solve_ivp(
             self.model,
-            [0, simulation_length_years],
+            [0, total_years],
             self.initial_state,
             method="RK45",
             t_eval=self.time,
@@ -241,11 +246,11 @@ class MixedLayerModel:
         self.time = self.result.t
         self.output = self.result.y
         print("Simulation complete.")
-        print(f"This {simulation_length_years} year run took {end_time - start_time:.2f} seconds.")
+        print(f"This {total_years} year run took {end_time - start_time:.2f} seconds.")
 
         # Drop spin-up years
         if spin_up_time > 0:
-            one_year_steps = int(num_steps / simulation_length_years)
+            one_year_steps = int(num_steps / total_years)
             spin_up_steps = spin_up_time * one_year_steps
             self.time = self.time[spin_up_steps:] - spin_up_time
             self.output = self.output[:, spin_up_steps:]
@@ -255,8 +260,8 @@ class MixedLayerModel:
         data_output.save_output_to_file(
             time=self.time,
             output=self.output,
-            salinity=constants.DEFAULT_SALINITY,
-            temperature=constants.DEFAULT_TEMP_CELSIUS,
+            salinity=self.salinity_forcing,
+            temperature=self.temp_celsius,
         )
 
 if __name__ == "__main__":
@@ -266,18 +271,18 @@ if __name__ == "__main__":
     
     # Configuration
     spin_up_time = constants.DEFAULT_SPIN_UP_TIME
-    simulation_length_years = constants.DEFAULT_SIMULATION_LENGTH_YEARS
-    total_years = spin_up_time + simulation_length_years
-    num_steps = 365 * total_years
+    num_steps = constants.TOTAL_DAYS
 
     # Load forcings from North Atlantic outside Gulf of Maine based on Fig 6 in Cei et al. 2020
-    temperature, salinity = load_model_forcings('ne', total_years)
+    temperature, salinity = load_model_forcings('ne')
 
     # Initialize the model
     model_instance = MixedLayerModel(temp_celsius=temperature, salinity=salinity)
+    # model_instance = MixedLayerModel(temp_celsius=constants.DEFAULT_TEMP_CELSIUS, salinity=constants.DEFAULT_SALINITY)
+
     
     # Run the model
-    model_instance.run_model(simulation_length_years=total_years, num_steps=num_steps, spin_up_time=spin_up_time)
+    model_instance.run_model(total_years=constants.TOTAL_YEARS, num_steps=num_steps, spin_up_time=spin_up_time)
 
     # Plot results
     plot_variables(

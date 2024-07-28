@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from . import data_output
+from . import constants
 import os
 
 def plot_variables(time, output, temp_celsius, salinity, title="Model results"):
@@ -14,19 +15,27 @@ def plot_variables(time, output, temp_celsius, salinity, title="Model results"):
     - salinity: Array of salinity forcing (PSU) 
     - title: Title of the plot
     """
-    # Extend temperature and salinity to match the time length
-    num_years = int(np.ceil(len(time) / 365))
-    extended_temperature = np.tile(temp_celsius, num_years)
-    extended_salinity = np.tile(salinity, num_years)
+    # # Extend temperature and salinity to match the time length
+    # num_years = int(np.ceil(len(time) / 365))
+    num_years = constants.TOTAL_YEARS
+    # extended_temperature = np.tile(temp_celsius, num_years)
+    # extended_salinity = np.tile(salinity, num_years)
 
-    # Ensure temperature and salinity arrays match the length of time
-    extended_temperature = extended_temperature[:len(time)]
-    extended_salinity = extended_salinity[:len(time)]
+    # # Ensure temperature and salinity arrays match the length of time
+    # extended_temperature = extended_temperature[:len(time)]
+    # extended_salinity = extended_salinity[:len(time)]
+
+    if len(temp_celsius) < len(time):
+        temp_celsius = np.repeat(temp_celsius, len(time))
+        salinity = np.repeat(salinity, len(time))
 
     # DIC, ALK, and d13C from model output
     DIC = output[0]
     ALK = output[1]
     d13C = output[2] / output[0]
+
+    extended_salinity = salinity
+    extended_temperature = temp_celsius
 
     # Calculate carbonate system variables from PyCO2SYS
     carb_chem = data_output.compute_carbonate_system(DIC, ALK, extended_temperature, extended_salinity)

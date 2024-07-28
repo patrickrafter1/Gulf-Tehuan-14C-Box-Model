@@ -18,7 +18,6 @@ def save_output_to_file(time, output, salinity, temperature):
             "ALK": output[1],
             "d13C": output[2] / output[0],
             "D14C": output[3] / output[0],
-            # "salinity": output[4],
             "salinity": salinity,
             "temperature": temperature,
         }

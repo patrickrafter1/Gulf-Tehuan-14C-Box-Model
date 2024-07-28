@@ -3,11 +3,13 @@ import numpy as np
 # Experiment length
 DEFAULT_SIMULATION_LENGTH_YEARS = 2  # years
 DEFAULT_SPIN_UP_TIME = 5  # years
+TOTAL_YEARS = DEFAULT_SIMULATION_LENGTH_YEARS + DEFAULT_SPIN_UP_TIME
+TOTAL_DAYS = TOTAL_YEARS * 365
 
 # Constants
-DEFAULT_TEMP_CELSIUS = 20
+DEFAULT_TEMP_CELSIUS = 15
 DEFAULT_TEMP_KELVIN = DEFAULT_TEMP_CELSIUS + 273.15
-DEFAULT_SALINITY = 34.78
+DEFAULT_SALINITY = 33.5
 # Total borate in mol/kg-sw following Uppstrom (1974)
 BORON_COEFFICIENT = 0.0004157 / 35
 
@@ -31,7 +33,13 @@ VERTICAL_MIXING_SUMMER = 0  # no summer mixing based on Cai et al., 2020
 
 # Seasonal Biology Flux
 BIOLOGY_FLUX_SUMMER = 0.1  # max flux of 0.1 mmol m−3 DIC per day from Cai et al., 2020
-BIOLOGY_FLUX_WINTER = 0.01  # 10% of summer flux 
+BIOLOGY_FLUX_WINTER = 0.01  # 10% of summer flux
+AVERAGE_DIC = 2050 # µmol/kg
+FRACTIONAL_RATE_SUMMER = BIOLOGY_FLUX_SUMMER / AVERAGE_DIC
+FRACTIONAL_RATE_WINTER = BIOLOGY_FLUX_WINTER / AVERAGE_DIC 
+EXPORT_FRACTION_POC = 0.20 # 15 %–25 % of organic material is exported to > 100 m-Henson et al. (2011)
+RAIN_RATIO = 0.07 # carbonate : org. in sinking particles-Sarmiento et al. (2002)
+CACO3_DISSOLUTION_RATE = 0.38 # units day-1 Hales and Emerson (1997)
 
 # Biology Parameters
 CACO3_FRAC = 0.07 # .07 CaCO3 fraction of NPP
