@@ -39,7 +39,8 @@ Given that chemical and isotopic equilibrium occurs on a timescale of seconds (Z
 
 ### Model Initiation and Iteration
 
-The model is spun up for 5 years to ensure a steady state of isotopic equilibrium with the atmosphere. It is initialized with a δ¹³C-DIC of 1‰ and a Δ¹⁴C of 0‰. Following Cai et al. (2020), the carbonate system is initialized with values calculated from PyCO2SYS (Humphreys et al., 2022) based on a pCO₂(aq) in equilibrium with atmospheric values (395 μatm) and alkalinity calculated with salinity. ΔDIC_bio and ΔDIC_vertical are prescribed as fractional changes (values mentioned above), while ΔpCO₂_air-sea is calculated at each time step using the relationship ΔpCO₂_air-sea = 0.24 * k * K₀ * (pCO₂_t(aq) - pCO₂_atm). K₀ is the CO₂ gas solubility (Weiss, 1974) and k is defined as 0.251 * W² * (Sc/660)⁻⁰·⁵, where W is wind speed in m/s and Sc is the Schmidt number (Wanninkhof, 1992; 2014). For ΔpCO₂_air-sea, pCO₂_t(aq) is calculated using an iterative CO₂ solver. At each time step, DIC_t+1 is updated based on ΔDIC_bio, ΔDIC_vertical, and ΔpCO₂_air-sea. At the end of the simulation, PyCO2SYS is used to back-calculate pCO₂, pH, and Ω_aragonite based on the model's DIC, ALK, and temperature and salinity forcing.
+The model is spun up for 5 years to ensure a steady state of isotopic equilibrium with the atmosphere. It is initialized with a δ<sup>13</sup>C-DIC of 1‰ and a Δ<sup>14</sup>C of 0‰. Following Cai et al. (2020), the carbonate system is initialized with values calculated from PyCO2SYS (Humphreys et al., 2022) based on a pCO₂(aq) in equilibrium with atmospheric values (395 μatm) and alkalinity calculated with salinity. ΔDIC<sub>bio</sub> and ΔDIC<sub>vertical</sub> are prescribed as fractional changes (values mentioned above), while ΔpCO₂<sub>air-sea</sub> is calculated at each time step using the relationship ΔpCO₂<sub>air-sea</sub> = 0.24 * k * K₀ * (pCO₂<sub>t(aq)</sub> - pCO₂<sub>atm</sub>). K₀ is the CO₂ gas solubility (Weiss, 1974) and k is defined as 0.251 * W² * (Sc/660)⁻⁰·⁵, where W is wind speed in m/s and Sc is the Schmidt number (Wanninkhof, 1992; 2014). For ΔpCO₂<sub>air-sea</sub>, pCO₂<sub>t(aq)</sub> is calculated using an iterative CO₂ solver. At each time step, DIC<sub>t+1</sub> is updated based on ΔDIC<sub>bio</sub>, ΔDIC<sub>vertical</sub>, and ΔpCO₂<sub>air-sea</sub>. At the end of the simulation, PyCO2SYS is used to back-calculate pCO₂, pH, and Ω<sub>aragonite</sub> based on the model's DIC, ALK, and temperature and salinity forcing.
+
 
 ## Running the Model
 
@@ -136,6 +137,8 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## References
 
+### References
+
 1. **Cai et al. (2020)**: Cai, W. J., Xu, Y. Y., Feely, R. A., et al. (2020). Controls on surface water carbonate chemistry along North American ocean margins. Nature Communications, 11, 2691. https://doi.org/10.1038/s41467-020-16530-z
 2. **Henson et al. (2011)**: Henson, S. A., Sanders, R., & Madsen, E. (2012). Global patterns in efficiency of particulate organic carbon export and transfer to the deep ocean. Global Biogeochemical Cycles, 26(1). doi:10.1029/2011GB004099
 3. **Sarmiento and Gruber (2002)**: Sarmiento, J. L., & Gruber, N. (2002). Sinks for anthropogenic carbon. Physics Today, 55(8), 30-36. doi:10.1063/1.1510279
@@ -144,7 +147,16 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 6. **Toggweiler and Sarmiento (1985)**: Toggweiler, J. R., & Sarmiento, J. L. (1985). Glacial to interglacial changes in atmospheric carbon dioxide: The critical role of ocean surface water in high latitudes. In E. T. Sundquist & W. S. Broecker (Eds.), The carbon cycle and atmospheric CO2: Natural variations Archean to present (Vol. 32, pp. 163-184). American Geophysical Union.
 7. **Vogel et al. (1970)**: Vogel, J. C., Grootes, P. M., & Mook, W. G. (1970). Isotopic fractionation between gaseous and dissolved carbon dioxide. Zeitschrift für Physik A Hadrons and Nuclei, 230(3), 225-238.
 8. **Jahn et al. (2015)**: Jahn, A., Claussen, M., Brovkin, V., & Ganopolski, A. (2015). Quantifying the effect of CO2 concentration on the spread of arid zones during the late Miocene. Earth and Planetary Science Letters, 452, 223-231.
-9. **Siegenthaler and Munnich (1981)**: Siegenthaler, U., & Munnich, K. O. (1981). 13C/12C fractionation during CO2 transfer from air to sea. In E. T. Sundquist & W. S. Broecker (Eds.), The Carbon Cycle and Atmospheric CO2: Natural Variations Archean to Present (Vol. 32, pp
+9. **Siegenthaler and Munnich (1981)**: Siegenthaler, U., & Munnich, K. O. (1981). 13C/12C fractionation during CO2 transfer from air to sea. In E. T. Sundquist & W. S. Broecker (Eds.), The Carbon Cycle and Atmospheric CO2: Natural Variations Archean to Present (Vol. 32, pp. 259-269). American Geophysical Union. doi:10.1029/GM032p0259
+10. **Zhang (1995)**: Zhang, J. (1995). The 13C/12C ratios of atmospheric CO2 in Beijing, China. Geochimica et Cosmochimica Acta, 59(4), 831-837. doi:10.1016/0016-7037(95)90522-Z
+11. **Zeebe and Wolf-Gladrow (2001)**: Zeebe, R. E., & Wolf-Gladrow, D. A. (2001). CO2 in seawater: equilibrium, kinetics, isotopes. Elsevier Science.
+12. **Broecker and Peng (1982)**: Broecker, W. S., & Peng, T. H. (1982). Tracers in the sea. Lamont-Doherty Geological Observatory.
+13. **Schmittner et al. (2013)**: Schmittner, A., Mix, A. C., & Pisias, N. G. (2013). Regional patterns of deglacial warming. Quaternary Science Reviews, 68, 22-34.
+14. **Zeebe et al. (1999)**: Zeebe, R. E., Sanyal, A., Ortiz, J. D., & Wolf-Gladrow, D. A. (1999). A theoretical study of the kinetics of the CO2 system in seawater. Marine Chemistry, 65(3-4), 135-152.
+15. **Humphreys et al. (2022)**: Humphreys, M. P., Achterberg, E. P., & Briggs, E. M. (2022). PyCO2SYS v1.7: marine carbonate system calculations in Python. Geoscientific Model Development, 15(4), 1377-1392. doi:10.5194/gmd-15-1377-2022
+16. **Weiss (1974)**: Weiss, R. F. (1974). Carbon dioxide in water and seawater: the solubility of a non-ideal gas. Marine Chemistry, 2, 203-215.
+17. **Wanninkhof (1992)**: Wanninkhof, R. (1992). Relationship between wind speed and gas exchange over the ocean. Journal of Geophysical Research: Oceans, 97(C5), 7373-7382.
+18. **Wanninkhof (2014)**: Wanninkhof, R. (2014). Relationship between wind speed and gas exchange over the ocean revisited. Limnology and Oceanography: Methods, 12(6), 351-362.
 
 ## Contact
 
