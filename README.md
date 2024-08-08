@@ -23,7 +23,7 @@ It has been extended to include realistic forcings based on Cai et al. (2020):
 
 2. **Biological Production**: A similar normalization approach is used for biological production, with a maximum DIC flux of 0.1 µmol kg⁻¹ day⁻¹ from March through September and a reduced flux of 0.01 µmol kg⁻¹ day⁻¹ for the rest of the year. This flux is normalized to the average DIC concentration of 2050 µmol kg⁻¹, based on the maximum ΔDIC_bio (0.1 mmol C day⁻¹ m⁻³) reported by Cai et al. (2020).
 
-3. **Export Production, CaCO₃ Production, and Dissolution**: The model includes the export of particulate organic carbon (POC) and the production and dissolution of CaCO₃. An organic export percentage of 20% is used, based on Henson et al. (2011). The PIC:POC rain ratio is set at 0.07, based on Sarmiento et al. (2002), and a daily CaCO₃ dissolution rate of 38% is applied, based on Hales and Emerson (1997).
+3. **Export Production, CaCO₃ Production, and Dissolution**: The model includes the export of particulate organic carbon (POC) and the production and dissolution of CaCO₃. An organic export percentage of 20% is used, based on Henson et al. (2011). The PIC:POC rain ratio is set at 0.07, based on Sarmiento et al. (2002), and a daily CaCO₃ dissolution rate of .054% is applied.
 
 **Isotopic Fractionation During Biology:**
 
