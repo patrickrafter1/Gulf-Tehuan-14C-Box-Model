@@ -38,11 +38,12 @@ AVERAGE_DIC = 2050 # µmol/kg
 FRACTIONAL_RATE_SUMMER = BIOLOGY_FLUX_SUMMER / AVERAGE_DIC
 FRACTIONAL_RATE_WINTER = BIOLOGY_FLUX_WINTER / AVERAGE_DIC 
 EXPORT_FRACTION_POC = 0.20 # 15 %–25 % of organic material is exported to > 100 m-Henson et al. (2011)
-RAIN_RATIO = 0.07 # carbonate : org. in sinking particles-Sarmiento et al. (2002)
-CACO3_DISSOLUTION_RATE = 0.38 # units day-1 Hales and Emerson (1997)
+RAIN_RATIO = 0.07 # PIC : POC. in sinking particles-Sarmiento et al. (2002)
 
 # Biology Parameters
-CACO3_FRAC = 0.07 # .07 CaCO3 fraction of NPP
+NO3_UPTAKE_RATE_WINTER = 0.2  # 20% of NO3 is used per day
+NO3_UPTAKE_RATE_SUMMER = 0.5  # 50%
+C_N_REDFIELD = 106/16  # C:N ratio
 OFFSET_ORG = -22  # isotopic fractionation into organic matter
 OFFSET_CC = 2 # isotopic fractionation into CaCO3
 
@@ -51,6 +52,7 @@ SUBSURFACE_DIC = 2200  # µmol/kg
 SUBSURFACE_ALK = 2400  # µmol/kg
 SUBSURFACE_d13C = 1  # per mil - based on correspondance with Wei-Jun Cai
 SUBSURFACE_D14C = -100  # per mil - based on Rafter et al. 2022
+SUBSURFACE_NO3 = 15  # µmol/kg
 
 # Gas Exchange Parameters
 # Calculate K0 (Henry's constant for CO2 solubility in mol/kg-sw/atm) as a function of temperature and salinity

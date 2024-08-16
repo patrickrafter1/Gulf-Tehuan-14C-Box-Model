@@ -28,6 +28,7 @@ class MixedLayerModel:
     - DIC: calculated with PyCO2SYS from pCO2 and alkalinity
     - d13C: 1 per mil
     - D14C: 0 per mil
+    - Nitrate: 10 µmol/kg
 
     Parameters:
     - temp_celsius (array-like): Time-varying temperature in Celsius
@@ -42,7 +43,7 @@ class MixedLayerModel:
         - temp_celsius (array-like): Time-varying temperature in Celsius
         - salinity (array-like): Time-varying salinity
         """
-        self.num_tracers = 5
+        self.num_tracers = 6
         self.surface_area = surface_area  # m^2
         self.surface_volume = self.surface_area * constants.MIXED_LAYER_DEPTH  # m^3
         self.surface_mass = self.surface_volume * constants.SWD  # kg
@@ -74,8 +75,9 @@ class MixedLayerModel:
         self.del_13C = 1 * self.DIC # d13C*DIC units
         self.del_14C = 0 * self.DIC # D14C*DIC units
 
-        self.pco2_ocean = self.CO2_atm  # µatm
-        self.initial_state = np.hstack((self.DIC, self.alkalinity, self.del_13C, self.del_14C,self.salinity))
+        self.nitrate = 10  # µmol/kg
+
+        self.initial_state = np.hstack((self.DIC, self.alkalinity, self.del_13C, self.del_14C, self.salinity, self.nitrate))
 
         self.result = None
         self.time = None

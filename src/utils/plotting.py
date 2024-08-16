@@ -43,7 +43,7 @@ def plot_variables(time, output, temp_celsius, salinity, title="Model results"):
     pH = carb_chem["pH"]
     omega = carb_chem["omega"]
 
-    fig, axs = plt.subplots(4, 1, figsize=(6, 11), sharex=True)
+    fig, axs = plt.subplots(5, 1, figsize=(6, 11), sharex=True)
 
     # Temperature and Salinity
     ax1 = axs[0]
@@ -103,6 +103,12 @@ def plot_variables(time, output, temp_celsius, salinity, title="Model results"):
     ax7.tick_params(axis='y', labelcolor='blue')
     for tl in ax7.get_yticklabels():
         tl.set_color('blue')
+    
+    # NO3
+    ax8 = axs[4]
+    ax8.plot(time, output[5], label="NO3 µmol / kg", color='blue') 
+    ax8.set_ylabel("NO$_3$ µmol kg$^{-1}$", color='blue')
+    ax8.tick_params(axis='y', labelcolor='blue')
 
     # Custom x-axis labels
     tick_positions = []

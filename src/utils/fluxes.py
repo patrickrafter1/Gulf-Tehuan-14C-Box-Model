@@ -350,7 +350,7 @@ def vertical_mixing(current_state, num_tracers, day_of_year):
     Values based on Cai, WJ., Xu, YY., Feely, R.A. et al. Controls on surface water carbonate chemistry along North American ocean margins. Nat Commun 11, 2691 (2020). https://doi.org/10.1038/s41467-020-16530-z
 
     Parameters:
-        current_state (array-like): Current state with DIC, TA, d13C, and D14C concentrations.
+        current_state (array-like): Current state with DIC, TA, d13C, and D14C, NO3 concentrations.
         num_tracer (int): Number of tracers.
         surface_area (float): Surface area of the mixed layer.
         surface_mass (float): Surface mass of the mixed layer.
@@ -374,6 +374,7 @@ def vertical_mixing(current_state, num_tracers, day_of_year):
     d_dt[1] += (fractional_mixing * constants.SUBSURFACE_ALK) - (fractional_mixing * current_state[1])
     d_dt[2] += (fractional_mixing * constants.SUBSURFACE_d13C * constants.SUBSURFACE_DIC) - (fractional_mixing * current_state[2])
     d_dt[3] += (fractional_mixing * constants.SUBSURFACE_D14C * constants.SUBSURFACE_DIC) - (fractional_mixing * current_state[3])
+    d_dt[5] += (fractional_mixing * constants.SUBSURFACE_NO3) - (fractional_mixing * current_state[5])
 
     return d_dt
 
@@ -382,7 +383,7 @@ def biology(current_state, num_tracers, day_of_year):
     Calculate biological fluxes, including export production and CaCO₃ dynamics.
 
     Parameters:
-        current_state (array-like): Current state with DIC, TA, d13C, and D14C concentrations.
+        current_state (array-like): Current state with DIC, TA, d13C, D14C, and NO3 concentrations.
         num_tracers (int): Number of tracers.
         day_of_year (int): Day of the year (1-365).
 
@@ -391,37 +392,38 @@ def biology(current_state, num_tracers, day_of_year):
     """
 
     # Current DIC concentration
+    current_nitrate = current_state[5]
     current_dic = current_state[0]
 
     # Seasonal NCP rate based on current DIC
     if 79 <= day_of_year <= 273:  # Productive season (March through September)
-        ncp = constants.BIOLOGY_FLUX_SUMMER * current_dic
+        ncp_nitrogen = constants.NO3_UPTAKE_RATE_SUMMER * current_nitrate
     else:  # Non-productive season (October through February)
-        ncp = constants.BIOLOGY_FLUX_WINTER * current_dic
+        ncp_nitrogen = constants.NO3_UPTAKE_RATE_WINTER * current_nitrate
+
+    ncp_carbon = ncp_nitrogen * constants.C_N_REDFIELD
     
     # Export production fraction (portion of NCP exported as POC)
-    poc_export = constants.EXPORT_FRACTION_POC * ncp
+    poc_export = constants.EXPORT_FRACTION_POC * ncp_carbon
+    pon_export = constants.EXPORT_FRACTION_POC * ncp_nitrogen
+    pic_export = constants.RAIN_RATIO * poc_export  # PIC export
 
-    # CaCO₃ production (using rain ratio)
-    caco3_production = poc_export * constants.RAIN_RATIO
-    
-    # CaCO₃ dissolution rate (e.g., 38% per day)
-    caco3_dissolution = caco3_production * constants.CACO3_DISSOLUTION_RATE
-
+    # Calculate d13C and D14C values for POC and PIC
     current_d13C_ocean = current_state[2] / current_dic
-    d13C_org = current_d13C_ocean + constants.OFFSET_ORG
-    d13C_cc = current_d13C_ocean + constants.OFFSET_CC
+    d13C_poc = current_d13C_ocean + constants.OFFSET_ORG
+    d13C_pic = current_d13C_ocean + constants.OFFSET_CC
     current_D14C_ocean = current_state[3] / current_dic
-    D14C_org = current_D14C_ocean + 2 * constants.OFFSET_ORG
-    D14C_cc = current_D14C_ocean + 2 * constants.OFFSET_CC
+    D14C_poc = current_D14C_ocean + 2 * constants.OFFSET_ORG
+    D14C_pic = current_D14C_ocean + 2 * constants.OFFSET_CC
 
     d_dt = np.zeros((num_tracers))
 
     # Update DIC and tracers due to POC remineralization and PIC dissolution
-    d_dt[0] += poc_export + caco3_dissolution  # Increase DIC due to POC export and CaCO₃ dissolution
-    d_dt[1] -= caco3_dissolution * 2  # Decrease alkalinity due to CaCO₃ dissolution
-    d_dt[2] += poc_export * d13C_org + caco3_dissolution * d13C_cc
-    d_dt[3] += poc_export * D14C_org + caco3_dissolution * D14C_cc
+    d_dt[0] -= poc_export + pic_export
+    d_dt[1] -= pic_export * 2
+    d_dt[2] -= (poc_export * d13C_poc) + (pic_export * d13C_pic)
+    d_dt[3] -= (poc_export * D14C_poc) + (pic_export * D14C_pic)
+    d_dt[5] -= pon_export 
 
     return d_dt
 
