@@ -23,7 +23,7 @@ It has been extended to include realistic forcings based on Cai et al. (2020):
 
 2. **Biological Production**: A similar normalization approach is used for biological production, with a maximum DIC flux of 0.1 µmol kg⁻¹ day⁻¹ from March through September and a reduced flux of 0.01 µmol kg⁻¹ day⁻¹ for the rest of the year. This flux is normalized to the average DIC concentration of 2050 µmol kg⁻¹, based on the maximum ΔDIC_bio (0.1 mmol C day⁻¹ m⁻³) reported by Cai et al. (2020).
 
-3. **Export Production, CaCO₃ Production, and Dissolution**: The model includes the export of particulate organic carbon (POC) and the production and dissolution of CaCO₃. An organic export percentage of 20% is used, based on Henson et al. (2011). The PIC:POC rain ratio is set at 0.07, based on Sarmiento et al. (2002), and a daily CaCO₃ dissolution rate of 38% is applied, based on Hales and Emerson (1997).
+3. **Export Production, CaCO₃ Production, and Dissolution**: The model includes the export of particulate organic carbon (POC) and the production and dissolution of CaCO₃. An organic export percentage of 20% is used, based on Henson et al. (2011). The PIC:POC rain ratio is set at 0.07, based on Sarmiento et al. (2002), and a daily CaCO₃ dissolution rate of .054% is applied.
 
 **Isotopic Fractionation During Biology:**
 
@@ -31,7 +31,11 @@ Biological processes influence the carbon isotopic composition of the ocean (e.g
 
 **Isotopic Fractionation During Air-Sea Gas Exchange:**
 
-The kinetic fractionation factor for CO₂ transfer across the air-sea interface is set to -0.5‰, following Siegenthaler and Munnich (1981) and Zhang (1995). Equilibrium fractionation between atmospheric CO₂ and dissolved CO₂ in seawater is temperature-dependent, calculated using the fractionation factor α<sub>CO₂</sub> = -0.373 / Tₖ + 1.00019 (Vogel et al., 1970). The fractionation between dissolved CO₂ and HCO₃⁻ in seawater, α<sub>HCO₃</sub>, is similarly temperature-dependent, calculated as α<sub>HCO₃</sub> = -9.866 / Tₖ + 1.02412. These fractionation factors (α) are converted to isotopic enrichment factors (ε) to correspond to the delta notation (units per mil) for δ¹³C tracers. Since the isotopic fractionation is approximately twice as large for ¹⁴C as for ¹³C (Zeebe and Wolf-Gladrow, 2001), all isotopic enrichment factors for ¹⁴C are doubled.
+The kinetic fractionation factor (α<sub>k</sub>) for CO₂ transfer across the air-sea interface is set to 0.9995, following Siegenthaler and Munnich (1981) and Zhang (1995). The equilibrium fractionation between atmospheric CO₂ and dissolved CO₂ in seawater is temperature-dependent, calculated using the fractionation factor α<sub>CO₂</sub> = -0.373 / Tₖ + 1.00019 (Vogel et al., 1970). Therefore, the overall fractionation factor for air-sea carbon transfer is α<sub>k</sub> * α<sub>CO₂</sub>.
+
+Following Lynch-Stieglitz et al. (1995), the temperature-dependent equilibrium fractionation between dissolved CO₂ and DIC is approximated using the fractionation factor between dissolved CO₂ and HCO₃⁻, given by α<sub>HCO₃</sub> = -9.866 / Tₖ + 1.02412. Thus, the fractionation factor for sea-air carbon transfer is calculated as α<sub>k</sub> * α<sub>HCO₃</sub>.
+
+These fractionation factors (α) are converted to isotopic enrichment factors (ε) to align with the delta notation (units per mil) used for δ¹³C tracers. Considering that isotopic fractionation for ¹⁴C is approximately twice as large as for ¹³C (Zeebe and Wolf-Gladrow, 2001), all isotopic enrichment factors for ¹⁴C are doubled.
 
 **Equilibrium Assumptions:**
 
