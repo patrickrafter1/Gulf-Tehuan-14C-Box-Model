@@ -19,8 +19,8 @@ def load_model_forcings(region):
     - temperature (np.array): Array of temperature values.
     - salinity (np.array): Array of salinity values.
     """
-    temperature, salinity = load_real_data(region)
-    return temperature, salinity
+    temperature, salinity, ncp = load_real_data(region)
+    return temperature, salinity, ncp
 
 
 def load_real_data(region):
@@ -37,6 +37,7 @@ def load_real_data(region):
     Returns:
     - temperature (array): Temperature profile (°C) for each day of the simulation period.
     - salinity (array): Salinity profile (PSU) for each day of the simulation period.
+    - ncp (array): Net Community Production (mmol C m^-3 d^-1) for each day of the simulation period.
     """
     def loop_years(vec):
         slope = np.linspace(0, (vec[0] - vec[364]), 365)
@@ -53,15 +54,15 @@ def load_real_data(region):
     # Extract temperature and salinity data and process
     temp_data = loop_years(df[region + "temp"][:365].values)
     salt_data = loop_years(df[region + "salt"][:365].values)
+    ncp_data = loop_years(df[region + "ncpm"][:365].values)
+
 
     # Repeat profiles for the total simulation length
     temperature = np.tile(temp_data, (constants.TOTAL_DAYS // 365) + 1)[:constants.TOTAL_DAYS]
     salinity = np.tile(salt_data, (constants.TOTAL_DAYS // 365) + 1)[:constants.TOTAL_DAYS]
+    ncp = np.tile(ncp_data, (constants.TOTAL_DAYS // 365) + 1)[:constants.TOTAL_DAYS]
 
-    return temperature, salinity
-
-
-
+    return temperature, salinity, ncp
 
 def load_seasonal_forcings():
     """
@@ -91,7 +92,6 @@ def load_seasonal_forcings():
     salinity_one_year = sal_mean + sal_amplitude * np.sin(2 * np.pi * (days + sal_phase_shift) / days_in_year)
     
     # Repeat profiles for the total simulation length
-    total_days = constants.TOTAL_YEARS * days_in_year
     temperature = np.tile(temperature_one_year, constants.TOTAL_YEARS)
     salinity = np.tile(salinity_one_year, constants.TOTAL_YEARS)
 

@@ -32,18 +32,10 @@ VERTICAL_MIXING_WINTER = 0.1  # 0.1 mmol m−3 DIC per day from Cai et al., 2020
 VERTICAL_MIXING_SUMMER = 0  # no summer mixing based on Cai et al., 2020
 
 # Seasonal Biology Flux
-BIOLOGY_FLUX_SUMMER = 0.1  # max flux of 0.1 mmol m−3 DIC per day from Cai et al., 2020
-BIOLOGY_FLUX_WINTER = 0.01  # 10% of summer flux
-AVERAGE_DIC = 2050 # µmol/kg
-FRACTIONAL_RATE_SUMMER = BIOLOGY_FLUX_SUMMER / AVERAGE_DIC
-FRACTIONAL_RATE_WINTER = BIOLOGY_FLUX_WINTER / AVERAGE_DIC 
 EXPORT_FRACTION_POC = 0.20 # 15 %–25 % of organic material is exported to > 100 m-Henson et al. (2011)
 RAIN_RATIO = 0.07 # PIC : POC. in sinking particles-Sarmiento et al. (2002)
 
 # Biology Parameters
-NO3_UPTAKE_RATE_WINTER = 0.2  # 20% of NO3 is used per day
-NO3_UPTAKE_RATE_SUMMER = 0.5  # 50%
-C_N_REDFIELD = 106/16  # C:N ratio
 OFFSET_ORG = -22  # isotopic fractionation into organic matter
 OFFSET_CC = 2 # isotopic fractionation into CaCO3
 

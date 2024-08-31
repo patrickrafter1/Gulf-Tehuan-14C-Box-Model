@@ -374,11 +374,10 @@ def vertical_mixing(current_state, num_tracers, day_of_year):
     d_dt[1] += (fractional_mixing * constants.SUBSURFACE_ALK) - (fractional_mixing * current_state[1])
     d_dt[2] += (fractional_mixing * constants.SUBSURFACE_d13C * constants.SUBSURFACE_DIC) - (fractional_mixing * current_state[2])
     d_dt[3] += (fractional_mixing * constants.SUBSURFACE_D14C * constants.SUBSURFACE_DIC) - (fractional_mixing * current_state[3])
-    d_dt[5] += (fractional_mixing * constants.SUBSURFACE_NO3) - (fractional_mixing * current_state[5])
 
     return d_dt
 
-def biology(current_state, num_tracers, day_of_year):
+def biology(current_state, num_tracers, day_of_year, ncp):
     """
     Calculate biological fluxes, including export production and CaCO₃ dynamics.
 
@@ -386,29 +385,18 @@ def biology(current_state, num_tracers, day_of_year):
         current_state (array-like): Current state with DIC, TA, d13C, D14C, and NO3 concentrations.
         num_tracers (int): Number of tracers.
         day_of_year (int): Day of the year (1-365).
+        ncp (float): Net community production based on Cai et al., 2020.
 
     Returns:
         array: Rate of change of tracers.
     """
 
-    # Current DIC concentration
-    current_nitrate = current_state[5]
-    current_dic = current_state[0]
-
-    # Seasonal NCP rate based on current DIC
-    if 79 <= day_of_year <= 273:  # Productive season (March through September)
-        ncp_nitrogen = constants.NO3_UPTAKE_RATE_SUMMER * current_nitrate
-    else:  # Non-productive season (October through February)
-        ncp_nitrogen = constants.NO3_UPTAKE_RATE_WINTER * current_nitrate
-
-    ncp_carbon = ncp_nitrogen * constants.C_N_REDFIELD
-    
     # Export production fraction (portion of NCP exported as POC)
-    poc_export = constants.EXPORT_FRACTION_POC * ncp_carbon
-    pon_export = constants.EXPORT_FRACTION_POC * ncp_nitrogen
+    poc_export = ncp
     pic_export = constants.RAIN_RATIO * poc_export  # PIC export
 
     # Calculate d13C and D14C values for POC and PIC
+    current_dic = current_state[0]
     current_d13C_ocean = current_state[2] / current_dic
     d13C_poc = current_d13C_ocean + constants.OFFSET_ORG
     d13C_pic = current_d13C_ocean + constants.OFFSET_CC
@@ -419,11 +407,10 @@ def biology(current_state, num_tracers, day_of_year):
     d_dt = np.zeros((num_tracers))
 
     # Update DIC and tracers due to POC remineralization and PIC dissolution
-    d_dt[0] -= poc_export + pic_export
-    d_dt[1] -= pic_export * 2
+    d_dt[0] -= (poc_export + pic_export)
+    d_dt[1] -= (pic_export * 2)
     d_dt[2] -= (poc_export * d13C_poc) + (pic_export * d13C_pic)
     d_dt[3] -= (poc_export * D14C_poc) + (pic_export * D14C_pic)
-    d_dt[5] -= pon_export 
 
     return d_dt
 

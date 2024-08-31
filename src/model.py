@@ -35,7 +35,7 @@ class MixedLayerModel:
     - salinity (array-like): Time-varying salinity
     """
 
-    def __init__(self, temp_celsius, salinity, CO2_atm=constants.ATMOSPHERIC_CO2, d13C_atm=constants.ATMOSPHERIC_d13C, D14C_atm=constants.ATMOSPHERIC_D14C, surface_area=constants.SURFACE_AREA):
+    def __init__(self, temp_celsius, salinity, ncp, CO2_atm=constants.ATMOSPHERIC_CO2, d13C_atm=constants.ATMOSPHERIC_d13C, D14C_atm=constants.ATMOSPHERIC_D14C, surface_area=constants.SURFACE_AREA):
         """
         Initialize all variables needed for the box model.
 
@@ -43,7 +43,7 @@ class MixedLayerModel:
         - temp_celsius (array-like): Time-varying temperature in Celsius
         - salinity (array-like): Time-varying salinity
         """
-        self.num_tracers = 6
+        self.num_tracers = 5
         self.surface_area = surface_area  # m^2
         self.surface_volume = self.surface_area * constants.MIXED_LAYER_DEPTH  # m^3
         self.surface_mass = self.surface_volume * constants.SWD  # kg
@@ -60,6 +60,7 @@ class MixedLayerModel:
         self.temp_kelvin = self.temp_celsius + 273.15
         self.salinity_forcing = np.array(salinity)
         self.salinity = self.salinity_forcing[0] # PSU
+        self.ncp = ncp # net community production in mmol/m^3/day
 
         self.CO2_atm = CO2_atm  # ppm
         self.d13C_atm = d13C_atm  # per mil
@@ -75,9 +76,8 @@ class MixedLayerModel:
         self.del_13C = 1 * self.DIC # d13C*DIC units
         self.del_14C = 0 * self.DIC # D14C*DIC units
 
-        self.nitrate = 10  # µmol/kg
 
-        self.initial_state = np.hstack((self.DIC, self.alkalinity, self.del_13C, self.del_14C, self.salinity, self.nitrate))
+        self.initial_state = np.hstack((self.DIC, self.alkalinity, self.del_13C, self.del_14C, self.salinity))
 
         self.result = None
         self.time = None
@@ -141,7 +141,7 @@ class MixedLayerModel:
             day_of_year=day_of_year,
         )
     
-    def _calculate_biology(self, state_vector, day_of_year):
+    def _calculate_biology(self, state_vector, day_of_year, ncp):
         """
         Calculate photosynthesis and respiration fluxes.
 
@@ -156,6 +156,7 @@ class MixedLayerModel:
             current_state=state_vector,
             num_tracers=self.num_tracers,
             day_of_year=day_of_year,
+            ncp=ncp,
         )  
     
     def _calculate_salinity_effects(self, state_vector, day_of_year, salinity):
@@ -191,6 +192,7 @@ class MixedLayerModel:
         day_of_year = self.calculate_day_of_year(time)
         current_temp_celsius = np.interp(day_of_year, np.arange(len(self.temp_celsius)), self.temp_celsius)
         current_salinity = np.interp(day_of_year, np.arange(len(self.salinity_forcing)), self.salinity_forcing)
+        current_ncp = np.interp(day_of_year, np.arange(len(self.ncp)), self.ncp)
 
         current_year = int(time)
         experiment_year = current_year - constants.DEFAULT_SPIN_UP_TIME
@@ -204,7 +206,7 @@ class MixedLayerModel:
         
         d_dt_gasexchange = self._calculate_gas_exchange(state_vector, day_of_year, current_temp_celsius, current_salinity)
         d_dt_mixing = self._calculate_mixing(state_vector, day_of_year)
-        d_dt_biology = self._calculate_biology(state_vector, day_of_year)
+        d_dt_biology = self._calculate_biology(state_vector, day_of_year, current_ncp)
         d_dt_dilution = self._calculate_salinity_effects(state_vector, day_of_year, current_salinity)
 
         d_dt += d_dt_gasexchange
@@ -276,11 +278,11 @@ if __name__ == "__main__":
     num_steps = constants.TOTAL_DAYS
 
     # Load forcings from North Atlantic outside Gulf of Maine based on Fig 6 in Cei et al. 2020
-    temperature, salinity = load_model_forcings('ne')
+    temperature, salinity, ncp = load_model_forcings('ne')
 
     # Initialize the model
-    model_instance = MixedLayerModel(temp_celsius=temperature, salinity=salinity)
-    # model_instance = MixedLayerModel(temp_celsius=constants.DEFAULT_TEMP_CELSIUS, salinity=constants.DEFAULT_SALINITY)
+    model_instance = MixedLayerModel(temp_celsius=temperature, salinity=salinity, ncp=ncp)
+    # model_instance = MixedLayerModel(temp_celsius=constants.DEFAULT_TEMP_CELSIUS, salinity=constants.DEFAULT_SALINITY, ncp=ncp)
 
     
     # Run the model
