@@ -161,10 +161,16 @@ cython_debug/
 plot_style.py
 font_setup.py
 .vscode/
+
+# Ignore all files in these directories
 data/model_output/*
 data/plots/*
 
-# Do not ignore these specific files
+# Don't ignore the directories themselves (keep the subdirectories tracked)
+!data/model_output/
+!data/plots/
+
+# Don't ignore the .gitkeep files (or other specific files you want to track)
 !data/model_output/.gitkeep
 !data/plots/.gitkeep
 
