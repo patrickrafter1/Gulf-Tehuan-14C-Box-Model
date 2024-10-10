@@ -205,7 +205,7 @@ class MixedLayerModel:
         
         d_dt_gasexchange = self._calculate_gas_exchange(state_vector, day_of_year, current_temp_celsius, current_salinity)
         d_dt_mixing = self._calculate_mixing(state_vector, day_of_year)
-        d_dt_biology = self._calculate_biology(state_vector, day_of_year, current_ncp)
+        d_dt_biology = self._calculate_biology(state_vector, current_ncp)
         d_dt_dilution = self._calculate_salinity_effects(state_vector, day_of_year, current_salinity)
 
         d_dt += d_dt_gasexchange
