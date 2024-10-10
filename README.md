@@ -8,22 +8,18 @@ The model is originally based on the work by Lynch-Stieglitz et al. (1995):
 
 > Lynch-Stieglitz, J., Stocker, T. F., Broecker, W. S., & Fairbanks, R. G. (1995). The influence of air-sea exchange on the isotopic composition of oceanic carbon: Observations and modeling. Global Biogeochemical Cycles, 9(4), 653–665. doi:10.1029/95GB02574
 
-It has been extended to include realistic forcings based on Cai et al. (2020):
+It has been extended to include realistic forcings from Cai et al. (2020):
 
 > Cai, W. J., Xu, Y. Y., Feely, R. A., et al. (2020). Controls on surface water carbonate chemistry along North American ocean margins. Nature Communications, 11, 2691. https://doi.org/10.1038/s41467-020-16530-z
 
-**Forcings and Processes:**
+**Forcings:** 
+
+The following forcings are applied to the model to simulate realistic oceanic conditions:
 
 - **Temperature and Salinity**: Derived from the Mercator 1/12° data-assimilated General Circulation Model, provided at daily resolution.
 - **Wind Speed**: Prescribed seasonally: 7 m/s from March through September and 10.5 m/s from October through February.
-
-**Vertical Mixing and Biological Production:**
-
-1. **Vertical Mixing**: The fractional change in tracers due to vertical mixing is based on a 0.1 µmol kg⁻¹ day⁻¹ DIC flux, as used in Cai et al. (2020), normalized to the current DIC concentration. This fractional rate is then applied to the subsurface boundary conditions (DIC = 2200 µmol kg⁻¹; ALK = 2400 µmol kg⁻¹; δ¹³C-DIC = 1‰; Δ¹⁴C-DIC = -100‰), effectively scaling the flux according to the subsurface conditions. Vertical mixing is applied only during winter months (October through February), with no mixing in summer.
-
-2. **Biological Production**: A similar normalization approach is used for biological production, with a maximum DIC flux of 0.1 µmol kg⁻¹ day⁻¹ from March through September and a reduced flux of 0.01 µmol kg⁻¹ day⁻¹ for the rest of the year. This flux is normalized to the average DIC concentration of 2050 µmol kg⁻¹, based on the maximum ΔDIC_bio (0.1 mmol C day⁻¹ m⁻³) reported by Cai et al. (2020).
-
-3. **Export Production, CaCO₃ Production, and Dissolution**: The model includes the export of particulate organic carbon (POC) and the production and dissolution of CaCO₃. An organic export percentage of 20% is used, based on Henson et al. (2011). The PIC:POC rain ratio is set at 0.07, based on Sarmiento et al. (2002), and a daily CaCO₃ dissolution rate of .054% is applied.
+- **Net Community Production**: Derived from weekly averages of daily changes in satellite-derived chlorophyll (Chl) for the year 2015 using the daily MODIS aqua 4km level 3 product. The NCP values are interpolated to daily time series, with a maximum NCP of ~0.1 mmol C day⁻¹ m⁻³. More details can be found in Cai et al. (2020).
+- **Vertical Mixing**: Vertical mixing during winter months (October through February) is simulated based on the fixed vertical mixing flux from Cai et al. (2020) of 0.1 mmol m⁻³ day⁻¹. We convert the mixing flux to a unitless daily mixing rate by dividing it by the current surface DIC concentration. This rate is then used to calculate the flux of tracers (DIC, ALK, δ¹³C, and Δ¹⁴C) between the subsurface (based on subsurface boundary conditions of DIC = 2200 µmol kg⁻¹; ALK = 2400 µmol kg⁻¹; δ¹³C-DIC = 1‰; Δ¹⁴C-DIC = -100‰) and surface layers. Under the assumption of steady-state conditions, the same amount of tracers mixed into the surface layer from the subsurface is also removed. No mixing occurs during summer (March through September).
 
 **Isotopic Fractionation During Biology:**
 
@@ -43,66 +39,64 @@ Given that chemical and isotopic equilibrium occurs on a timescale of seconds (Z
 
 ### Model Initiation and Iteration
 
-The model is spun up for 5 years to ensure a steady state of isotopic equilibrium with the atmosphere. It is initialized with a δ<sup>13</sup>C-DIC of 1‰ and a Δ<sup>14</sup>C of 0‰. Following Cai et al. (2020), the carbonate system is initialized with values calculated from PyCO2SYS (Humphreys et al., 2022) based on a pCO₂(aq) in equilibrium with atmospheric values (395 μatm) and alkalinity calculated with salinity. ΔDIC<sub>bio</sub> and ΔDIC<sub>vertical</sub> are prescribed as fractional changes (values mentioned above), while ΔpCO₂<sub>air-sea</sub> is calculated at each time step using the relationship ΔpCO₂<sub>air-sea</sub> = 0.24 * k * K₀ * (pCO₂<sub>t(aq)</sub> - pCO₂<sub>atm</sub>). K₀ is the CO₂ gas solubility (Weiss, 1974) and k is defined as 0.251 * W² * (Sc/660)⁻⁰·⁵, where W is wind speed in m/s and Sc is the Schmidt number (Wanninkhof, 1992; 2014). For ΔpCO₂<sub>air-sea</sub>, pCO₂<sub>t(aq)</sub> is calculated using an iterative CO₂ solver. At each time step, DIC<sub>t+1</sub> is updated based on ΔDIC<sub>bio</sub>, ΔDIC<sub>vertical</sub>, and ΔpCO₂<sub>air-sea</sub>. At the end of the simulation, PyCO2SYS is used to back-calculate pCO₂, pH, and Ω<sub>aragonite</sub> based on the model's DIC, ALK, and temperature and salinity forcing.
+The model is spun up for 5 years to ensure a steady state of isotopic equilibrium with the atmosphere. It is initialized with a δ<sup>13</sup>C-DIC of 1‰ and a Δ<sup>14</sup>C of 0‰. Following Cai et al. (2020), the carbonate system is initialized with values calculated from PyCO2SYS (Humphreys et al., 2022) based on a pCO₂(aq) in equilibrium with atmospheric values (395 μatm) and alkalinity calculated based on salinity. ΔDIC<sub>bio</sub> and ΔDIC<sub>vertical</sub> are prescribed as fractional changes (values mentioned above), while ΔpCO₂<sub>air-sea</sub> is calculated at each time step using the relationship ΔpCO₂<sub>air-sea</sub> = 0.24 * k * K₀ * (pCO₂<sub>t(aq)</sub> - pCO₂<sub>atm</sub>). K₀ is the CO₂ gas solubility (Weiss, 1974) and k is defined as 0.251 * W² * (Sc/660)⁻⁰·⁵, where W is wind speed in m/s and Sc is the Schmidt number (Wanninkhof, 1992; 2014). For ΔpCO₂<sub>air-sea</sub>, pCO₂<sub>t(aq)</sub> is calculated using an iterative CO₂ solver. At each time step, DIC<sub>t+1</sub> is updated based on ΔDIC<sub>bio</sub>, ΔDIC<sub>vertical</sub>, and ΔpCO₂<sub>air-sea</sub>. At the end of the simulation, PyCO2SYS is used to back-calculate pCO₂, pH, and Ω<sub>aragonite</sub> based on the model's DIC, ALK, and temperature and salinity forcing.
 
 
 ## Running the Model
 
-To run the model, follow these steps:
+To run the model using `conda`, follow these steps:
 
-1. **Clone the repository:**
+1. **Ensure `conda` or `Anaconda` is installed:**
+
+   If you don't have `conda` installed, you can download and install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/distribution).
+
+2. **Create and activate a `conda` environment:**
+
+    - Create a new environment using the provided `environment.yml` file:
+
+      ```bash
+      conda env create -f environment.yml
+      ```
+
+    - Activate the environment:
+
+      ```bash
+      conda activate mld-box-model
+      ```
+
+3. **Clone the repository:**
 
     ```bash
     git clone https://github.com/RyanAGreen/mld-box-model-c-isotopes.git
     cd mld-box-model-c-isotopes
     ```
 
-2. **Create and activate a virtual environment:**
-
-    - **Using `venv` (Python 3 standard library):**
-
-      ```bash
-      python3 -m venv mld-box-model
-      ```
-
-    - **Activate the virtual environment:**
-
-      - On Windows:
-
-        ```bash
-        .\mld-box-model\Scripts\activate
-        ```
-
-      - On macOS and Linux:
-
-        ```bash
-        source mld-box-model/bin/activate
-        ```
-
-3. **Install the required dependencies:**
-
-    ```bash
-    pip install -r requirements.txt
-    ```
-
 4. **Adjust model parameters:**
    
-    You can also modify the experiment length, mixed layer properties, atmospheric conditions, the parameterized seasonal forcings, and all other parameters within `src/utils/constants.py`.
+    You can modify the experiment length, mixed layer properties, atmospheric conditions, the parameterized seasonal forcings, and other parameters within `src/utils/constants.py` as needed.
 
 5. **Run the model:**
 
     ```bash
     python src/model.py
     ```
+
     An overview figure will be generated and saved as `model_results.png` in the `data/plots` directory. Additionally, a text file containing the model results will be saved as `model_results.txt` in the `data` directory for further analysis.
 
-6. **Deactivate the virtual environment:**
+6. **Deactivate the `conda` environment:**
 
-    When you're done working with the model, deactivate the virtual environment:
+    When you're done working with the model, deactivate the environment:
 
     ```bash
-    deactivate
+    conda deactivate
     ```
+
+7. **Note**: If you want to work on the model later, remember to reactivate the `conda` environment before running any code:
+
+    ```bash
+    conda activate mld-box-model
+    ```
+
 
 ## Code Structure
 
@@ -112,7 +106,7 @@ The table below explains the files and directories included in this project.
 |---|---|
 | `README.md` | Project documentation (this file) |
 | `LICENSE` | License information |
-| `requirements.txt` | Dependencies for the project |
+| `environment.yml` | Conda environment file for dependencies |
 | `data` | Directory for data used or generated by the model |
 | `src` | Source code for the model |
 | `src/model.py` | Main model code |
@@ -122,7 +116,7 @@ The table below explains the files and directories included in this project.
 | `src/utils/data_input.py` | Data input functions |
 | `src/utils/data_output.py` | Data output functions |
 | `src/utils/plotting.py` | Plotting functions |
-| `src/utils/indata/mercator_tseries.h5` | Temperature and salinity data |
+| `src/utils/indata/mercator_tseries.h5` | Temperature, salinity, and net community production forcing data |
 | `src/__init__.py` | Python package initialization file |
 
 
