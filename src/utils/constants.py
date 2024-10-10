@@ -32,7 +32,6 @@ VERTICAL_MIXING_WINTER = 0.1  # 0.1 mmol m−3 DIC per day from Cai et al., 2020
 VERTICAL_MIXING_SUMMER = 0  # no summer mixing based on Cai et al., 2020
 
 # Seasonal Biology Flux
-EXPORT_FRACTION_POC = 0.20 # 15 %–25 % of organic material is exported to > 100 m-Henson et al. (2011)
 RAIN_RATIO = 0.07 # PIC : POC. in sinking particles-Sarmiento et al. (2002)
 
 # Biology Parameters

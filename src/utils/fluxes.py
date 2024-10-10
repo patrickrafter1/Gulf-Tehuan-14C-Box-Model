@@ -368,16 +368,28 @@ def vertical_mixing(current_state, num_tracers, day_of_year):
     else:  # Summer period (March through September)
         fractional_mixing = constants.VERTICAL_MIXING_SUMMER / current_dic # per day
 
+    DIC_vertical_mixing_in = fractional_mixing * constants.SUBSURFACE_DIC
+    DIC_vertical_mixing_out = fractional_mixing * current_state[0]
+    
+    ALK_vertical_mixing_in = fractional_mixing * constants.SUBSURFACE_ALK
+    ALK_vertical_mixing_out = fractional_mixing * current_state[1]
+
+    d13C_DIC_vertical_mixing_in = DIC_vertical_mixing_in * constants.SUBSURFACE_d13C
+    d13C_DIC_vertical_mixing_out = fractional_mixing * current_state[2] # current state already in delta * concentration units
+
+    D14C_DIC_vertical_mixing_in = DIC_vertical_mixing_in * constants.SUBSURFACE_D14C
+    D14C_DIC_vertical_mixing_out = fractional_mixing * current_state[3] # current state already in delta * concentration units
+
     # Calculate the mixing fluxes
     d_dt = np.zeros((num_tracers))
-    d_dt[0] += (fractional_mixing * constants.SUBSURFACE_DIC) - (fractional_mixing * current_state[0])
-    d_dt[1] += (fractional_mixing * constants.SUBSURFACE_ALK) - (fractional_mixing * current_state[1])
-    d_dt[2] += (fractional_mixing * constants.SUBSURFACE_d13C * constants.SUBSURFACE_DIC) - (fractional_mixing * current_state[2])
-    d_dt[3] += (fractional_mixing * constants.SUBSURFACE_D14C * constants.SUBSURFACE_DIC) - (fractional_mixing * current_state[3])
+    d_dt[0] += DIC_vertical_mixing_in - DIC_vertical_mixing_out
+    d_dt[1] += ALK_vertical_mixing_in - ALK_vertical_mixing_out
+    d_dt[2] += d13C_DIC_vertical_mixing_in - d13C_DIC_vertical_mixing_out
+    d_dt[3] += D14C_DIC_vertical_mixing_in - D14C_DIC_vertical_mixing_out
 
     return d_dt
 
-def biology(current_state, num_tracers, day_of_year, ncp):
+def biology(current_state, num_tracers, ncp):
     """
     Calculate biological fluxes, including export production and CaCO₃ dynamics.
 

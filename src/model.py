@@ -141,7 +141,7 @@ class MixedLayerModel:
             day_of_year=day_of_year,
         )
     
-    def _calculate_biology(self, state_vector, day_of_year, ncp):
+    def _calculate_biology(self, state_vector, ncp):
         """
         Calculate photosynthesis and respiration fluxes.
 
@@ -155,7 +155,6 @@ class MixedLayerModel:
         return fluxes.biology(
             current_state=state_vector,
             num_tracers=self.num_tracers,
-            day_of_year=day_of_year,
             ncp=ncp,
         )  
     
