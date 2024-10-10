@@ -61,7 +61,7 @@ To run the model using `conda`, follow these steps:
     - Create a new environment using the provided `environment.yml` file inside the cloned repository:
 
       ```bash
-      conda env create -f environment.yml
+      conda env create -f environment.yaml
       ```
 
     - Activate the environment:
@@ -72,7 +72,7 @@ To run the model using `conda`, follow these steps:
 
 4. **Adjust model parameters:**
    
-    You can modify the experiment length, mixed layer properties, atmospheric conditions, the parameterized seasonal forcings, and other parameters within `src/utils/constants.py` as needed.
+    You can modify the experiment length, mixed layer properties, atmospheric conditions, prescribed forcings, and other parameters within `src/utils/constants.py` as needed.
 
 5. **Run the model:**
 
@@ -80,7 +80,7 @@ To run the model using `conda`, follow these steps:
     python src/model.py
     ```
 
-    An overview figure will be generated and saved as `model_results.png` in the `data/plots` directory. Additionally, a text file containing the model results will be saved as `model_results.txt` in the `data` directory for further analysis.
+    Note that this will take a minute or two the first time the code is run. After that, each simulation should take only a few seconds (depending on the length of the experiment). An overview figure will be generated and saved as `model_results.png` in the `data/plots` directory. Additionally, a text file containing the model results will be saved as `model_results.txt` in the `data` directory for further analysis.
 
 6. **Deactivate the `conda` environment:**
 
