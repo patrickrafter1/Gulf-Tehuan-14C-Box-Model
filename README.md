@@ -41,7 +41,6 @@ Given that chemical and isotopic equilibrium occurs on a timescale of seconds (Z
 
 The model is spun up for 5 years to ensure a steady state of isotopic equilibrium with the atmosphere. It is initialized with a δ<sup>13</sup>C-DIC of 1‰ and a Δ<sup>14</sup>C of 0‰. Following Cai et al. (2020), the carbonate system is initialized with values calculated from PyCO2SYS (Humphreys et al., 2022) based on a pCO₂(aq) in equilibrium with atmospheric values (395 μatm) and alkalinity calculated based on salinity. ΔDIC<sub>bio</sub> and ΔDIC<sub>vertical</sub> are prescribed as fractional changes (values mentioned above), while ΔpCO₂<sub>air-sea</sub> is calculated at each time step using the relationship ΔpCO₂<sub>air-sea</sub> = 0.24 * k * K₀ * (pCO₂<sub>t(aq)</sub> - pCO₂<sub>atm</sub>). K₀ is the CO₂ gas solubility (Weiss, 1974) and k is defined as 0.251 * W² * (Sc/660)⁻⁰·⁵, where W is wind speed in m/s and Sc is the Schmidt number (Wanninkhof, 1992; 2014). For ΔpCO₂<sub>air-sea</sub>, pCO₂<sub>t(aq)</sub> is calculated using an iterative CO₂ solver. At each time step, DIC<sub>t+1</sub> is updated based on ΔDIC<sub>bio</sub>, ΔDIC<sub>vertical</sub>, and ΔpCO₂<sub>air-sea</sub>. At the end of the simulation, PyCO2SYS is used to back-calculate pCO₂, pH, and Ω<sub>aragonite</sub> based on the model's DIC, ALK, and temperature and salinity forcing.
 
-
 ## Running the Model
 
 To run the model using `conda`, follow these steps:
@@ -50,9 +49,16 @@ To run the model using `conda`, follow these steps:
 
    If you don't have `conda` installed, you can download and install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/distribution).
 
-2. **Create and activate a `conda` environment:**
+2. **Clone the repository:**
 
-    - Create a new environment using the provided `environment.yml` file:
+    ```bash
+    git clone https://github.com/RyanAGreen/mld-box-model-c-isotopes.git
+    cd mld-box-model-c-isotopes
+    ```
+
+3. **Create and activate a `conda` environment:**
+
+    - Create a new environment using the provided `environment.yml` file inside the cloned repository:
 
       ```bash
       conda env create -f environment.yml
@@ -63,13 +69,6 @@ To run the model using `conda`, follow these steps:
       ```bash
       conda activate mld-box-model
       ```
-
-3. **Clone the repository:**
-
-    ```bash
-    git clone https://github.com/RyanAGreen/mld-box-model-c-isotopes.git
-    cd mld-box-model-c-isotopes
-    ```
 
 4. **Adjust model parameters:**
    
