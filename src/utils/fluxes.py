@@ -325,7 +325,7 @@ def gas_exchange(
     # Calculate piston velocity based on wind speed and temperature
     piston_velocity = constants.piston_velocity(wind_speed, temp_celsius, salinity)
     piston_velocity_year = piston_velocity  # mol/(m²·yr·atm)
-
+    
     SeatoAir = piston_velocity_year * pco2_ocean * surface_area  # mol yr-1
     AirtoSea = piston_velocity_year * pco2_atm * surface_area  # mol yr-1
 
@@ -426,14 +426,17 @@ def biology(current_state, num_tracers, ncp):
 
     return d_dt
 
-def salinity_effects(current_state, num_tracers, day_of_year, salinity_forcing):
+def salinity_effects(current_state, num_tracers, salinity_forcing):
     """
-    Calculate changes in tracer concentrations due to changes in salinity.
+    We use salinity to calculate changes in tracer concentrations due to total volume changes.
+
+    For simplicity, this function assumes that salinity changes (e.g., due to evaporation and 
+    precipitation) do not alter the isotopic composition (δ13C, δ14C), and therefore no changes 
+    in isotopic ratios are simulated during this process.
 
     Parameters:
     - current_state (array): Current state variables [DIC, ALK, d13C, D14C, Salinity]
     - num_tracers (int): Number of tracers
-    - day_of_year (int): Day of the year
     - salinity_forcing (float): New salinity value (PSU)
 
     Returns:

@@ -158,7 +158,7 @@ class MixedLayerModel:
             ncp=ncp,
         )  
     
-    def _calculate_salinity_effects(self, state_vector, day_of_year, salinity):
+    def _calculate_salinity_effects(self, state_vector, salinity):
         """
         Calculate changes in tracer concentrations due to changes in salinity.
 
@@ -173,7 +173,6 @@ class MixedLayerModel:
         return fluxes.salinity_effects(
             current_state=state_vector,
             num_tracers=self.num_tracers,
-            day_of_year=day_of_year,
             salinity_forcing=salinity,
         )
 
@@ -206,7 +205,7 @@ class MixedLayerModel:
         d_dt_gasexchange = self._calculate_gas_exchange(state_vector, day_of_year, current_temp_celsius, current_salinity)
         d_dt_mixing = self._calculate_mixing(state_vector, day_of_year)
         d_dt_biology = self._calculate_biology(state_vector, current_ncp)
-        d_dt_dilution = self._calculate_salinity_effects(state_vector, day_of_year, current_salinity)
+        d_dt_dilution = self._calculate_salinity_effects(state_vector, current_salinity)
 
         d_dt += d_dt_gasexchange
         d_dt += d_dt_mixing

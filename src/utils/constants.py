@@ -43,7 +43,6 @@ SUBSURFACE_DIC = 2200  # µmol/kg
 SUBSURFACE_ALK = 2400  # µmol/kg
 SUBSURFACE_d13C = 1  # per mil - based on correspondance with Wei-Jun Cai
 SUBSURFACE_D14C = -100  # per mil - based on Rafter et al. 2022
-SUBSURFACE_NO3 = 15  # µmol/kg
 
 # Gas Exchange Parameters
 # Calculate K0 (Henry's constant for CO2 solubility in mol/kg-sw/atm) as a function of temperature and salinity
