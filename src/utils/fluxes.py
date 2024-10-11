@@ -426,7 +426,7 @@ def biology(current_state, num_tracers, ncp):
 
     return d_dt
 
-def salinity_effects(current_state, num_tracers, salinity_forcing):
+def dilution(current_state, num_tracers, salinity_forcing):
     """
     We use salinity to calculate changes in tracer concentrations due to total volume changes.
 

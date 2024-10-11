@@ -158,19 +158,23 @@ class MixedLayerModel:
             ncp=ncp,
         )  
     
-    def _calculate_salinity_effects(self, state_vector, salinity):
+    def _calculate_dilution(self, state_vector, salinity):
         """
-        Calculate changes in tracer concentrations due to changes in salinity.
+        We use salinity to calculate changes in tracer concentrations due to total volume changes.
+
+        For simplicity, this function assumes that salinity changes (e.g., due to evaporation and 
+        precipitation) do not alter the isotopic composition (δ13C, δ14C), and therefore no changes 
+        in isotopic ratios are simulated during this process.
 
         Parameters:
-        - state_vector (array): Current state variables
-        - day_of_year (int): Day of the year
-        - salinity (float): Current salinity
+        - current_state (array): Current state variables [DIC, ALK, d13C, D14C, Salinity]
+        - num_tracers (int): Number of tracers
+        - salinity_forcing (float): New salinity value (PSU)
 
         Returns:
-        - array: Changes in tracers due to dilution
+        - d_dt (array): Rate of change of tracers due to salinity changes
         """
-        return fluxes.salinity_effects(
+        return fluxes.dilution(
             current_state=state_vector,
             num_tracers=self.num_tracers,
             salinity_forcing=salinity,
@@ -205,7 +209,7 @@ class MixedLayerModel:
         d_dt_gasexchange = self._calculate_gas_exchange(state_vector, day_of_year, current_temp_celsius, current_salinity)
         d_dt_mixing = self._calculate_mixing(state_vector, day_of_year)
         d_dt_biology = self._calculate_biology(state_vector, current_ncp)
-        d_dt_dilution = self._calculate_salinity_effects(state_vector, current_salinity)
+        d_dt_dilution = self._calculate_dilution(state_vector, current_salinity)
 
         d_dt += d_dt_gasexchange
         d_dt += d_dt_mixing
