@@ -14,9 +14,9 @@ DEFAULT_SALINITY = 34.2 #WOA annual mean salinity at Gulf of Tehuantepec is 33.8
 BORON_COEFFICIENT = 0.0004157 / 35
 
 # Atmospheric Properties
-ATMOSPHERIC_CO2 = 395  # ppm
+ATMOSPHERIC_CO2 = 400  # ppm
 ATMOSPHERIC_d13C = -8  # per mil
-ATMOSPHERIC_D14C = 0  # per mil
+ATMOSPHERIC_D14C = 100  # per mil
 
 # Mixed Layer Properties
 MIXED_LAYER_DEPTH = 30  # meters
