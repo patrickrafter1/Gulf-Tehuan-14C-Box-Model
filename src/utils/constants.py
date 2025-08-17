@@ -6,6 +6,11 @@ DEFAULT_SPIN_UP_TIME = 5  # years
 TOTAL_YEARS = DEFAULT_SIMULATION_LENGTH_YEARS + DEFAULT_SPIN_UP_TIME
 TOTAL_DAYS = TOTAL_YEARS * 365
 
+# Seasonal Wind Speeds
+WIND_SPEED= 15
+WIND_SPEED_SUMMER = WIND_SPEED  # m/s
+WIND_SPEED_WINTER = WIND_SPEED  # m/s
+
 # Constants
 DEFAULT_TEMP_CELSIUS = 27.3 #model defalt is 15 #this is WOA annual mean temperature for Gulf of Tehuantepec
 DEFAULT_TEMP_KELVIN = DEFAULT_TEMP_CELSIUS + 273.15
@@ -25,10 +30,7 @@ SWD = 1029  # Seawater density kg/m^3
 MIXED_LAYER_INITIAL_D14C = ATMOSPHERIC_D14C # this is NEW from me
 MIXED_LAYER_INITIAL_d13C = ATMOSPHERIC_d13C+8.5 # this is NEW from me and assumes an equilibrium isotope fractionation from the atmosphere of +8.5 per mil
 
-# Seasonal Wind Speeds
-WIND_SPEED= 5
-WIND_SPEED_SUMMER = WIND_SPEED  # m/s
-WIND_SPEED_WINTER = WIND_SPEED  # m/s
+
 
 # Seasonal Vertical Mixing
 #REORGANIZING THESE TERMS TO BE JUST ONE "VERTICAL_MIXING"
@@ -76,6 +78,7 @@ def schmidt(temp_celsius):
     return 2073.1 - 125.62 * temp_celsius + 3.6276 * temp_celsius**2 - 0.043219 * temp_celsius**3
 
 # Calculate kappa based on wind speed, temperature, and salinity
+# Compute gas transfer velocity (in m year-1) as follows (Sweeney et al., 2007, figure 3 and table 1):
 def calculate_kappa(wind_speed, temp_celsius):
     sc = schmidt(temp_celsius)
     return 0.251 * wind_speed**2 * (sc / 660)**-0.5
