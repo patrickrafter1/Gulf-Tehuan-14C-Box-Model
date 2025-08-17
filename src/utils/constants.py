@@ -26,7 +26,7 @@ MIXED_LAYER_INITIAL_D14C = ATMOSPHERIC_D14C # this is NEW from me
 MIXED_LAYER_INITIAL_d13C = ATMOSPHERIC_d13C+8.5 # this is NEW from me and assumes an equilibrium isotope fractionation from the atmosphere of +8.5 per mil
 
 # Seasonal Wind Speeds
-WIND_SPEED= 0.5
+WIND_SPEED= 5
 WIND_SPEED_SUMMER = WIND_SPEED  # m/s
 WIND_SPEED_WINTER = WIND_SPEED  # m/s
 
@@ -51,11 +51,10 @@ RAIN_RATIO = 0.07 # PIC : POC. in sinking particles-Sarmiento et al. (2002)
 OFFSET_ORG = -22  # isotopic fractionation into organic matter
 OFFSET_CC = 2 # isotopic fractionation into CaCO3
 
-# Subsurface boundary conditions
-SUBSURFACE_DIC = 2200  # µmol/kg
-SUBSURFACE_ALK = 2400  # µmol/kg
-SUBSURFACE_d13C = 1  # per mil - based on correspondance with Wei-Jun Cai
-SUBSURFACE_D14C = -100  # per mil - based on Rafter et al. 2022
+SUBSURFACE_DIC = 1935  # µmol/kg #calculated by Rafter for GLODAP data just upstream of Gulf of Tehuantepec
+SUBSURFACE_ALK = 2160  # µmol/kg #calculate by Rafter from existing GLODAP DIC at 20m and Chapa-Balacorta 2015 pCO2 (via CO2SYS)
+SUBSURFACE_d13C = 0.0  # per mil - based on correspondance with Wei-Jun Cai
+SUBSURFACE_D14C = 0  # per mil - based on GLODAP transect and work to identify the upwelling water mass at 100m
 
 # Gas Exchange Parameters
 # Calculate K0 (Henry's constant for CO2 solubility in mol/kg-sw/atm) as a function of temperature and salinity
