@@ -33,6 +33,8 @@ def plot_variables(time, output, temp_celsius, salinity, title="Model results"):
     DIC = output[0]
     ALK = output[1]
     d13C = output[2] / output[0]
+    D14C = output[3] / output[0]
+    
 
     extended_salinity = salinity
     extended_temperature = temp_celsius
@@ -50,7 +52,7 @@ def plot_variables(time, output, temp_celsius, salinity, title="Model results"):
     ax1.plot(time, extended_salinity, label="Salinity", color='blue')
     ax1.set_ylabel("SSS", color='blue')
     ax1.tick_params(axis='y', labelcolor='blue')
-    ax1.set_ylim(32.5,34)
+    ax1.set_ylim(33.7,34)
     for tl in ax1.get_yticklabels():
         tl.set_color('blue')
 
@@ -58,7 +60,7 @@ def plot_variables(time, output, temp_celsius, salinity, title="Model results"):
     ax2.plot(time, extended_temperature, label="Temperature °C", color='red')
     ax2.set_ylabel("SST (°C)", color='red')
     ax2.tick_params(axis='y', labelcolor='red')
-    ax2.set_ylim(0, 30)
+    ax2.set_ylim(27, 29)
     for tl in ax2.get_yticklabels():
         tl.set_color('red')
 
@@ -66,7 +68,7 @@ def plot_variables(time, output, temp_celsius, salinity, title="Model results"):
     ax3 = axs[1]
     ax3.plot(time, pCO2, label="pCO2 µatm", color='blue')
     ax3.set_ylabel("${p}$CO$_2$ (µatm)", color='blue')
-    # ax3.set_ylim(300, 800)
+    ax3.set_ylim(100, 1500)
     ax3.tick_params(axis='y', labelcolor='blue')
     for tl in ax3.get_yticklabels():
         tl.set_color('blue')
@@ -75,41 +77,61 @@ def plot_variables(time, output, temp_celsius, salinity, title="Model results"):
     ax4.plot(time, pH, label="pH", color='red')
     ax4.set_ylabel("pH", color='red')
     ax4.tick_params(axis='y', labelcolor='red')
-    ax4.set_ylim(7.8, 8.1)
+    ax4.set_ylim(7.5, 8.5)
     for tl in ax4.get_yticklabels():
         tl.set_color('red')
 
-    # DIC
+    # DIC & ALK
     ax5 = axs[2]
     ax5.plot(time, DIC, label="DIC µmol / kg", color='blue')
     ax5.set_ylabel("DIC µmol kg$^{-1}$", color='blue')
     ax5.tick_params(axis='y', labelcolor='blue')
-    # ax5.set_ylim(1960,2120)
+    ax5.set_ylim(1600,2300)
     for tl in ax5.get_yticklabels():
         tl.set_color('blue')
 
     ax6 = ax5.twinx()
-    ax6.plot(time, omega, label="Ω", color='red')
-    ax6.set_ylabel("Ω$_{arag}$", color='red')
+    ax6.plot(time, ALK, label="alkalinity", color='red')
+    ax6.set_ylabel("ALK µmol kg$^{-1}$", color='red')
     ax6.tick_params(axis='y', labelcolor='red')
-    # ax6.set_ylim(1.3, 2.7)
+    ax6.set_ylim(2000, 2500)
     for tl in ax6.get_yticklabels():
         tl.set_color('red')
+
+    
+    # ax6 = ax5.twinx()
+    # ax6.plot(time, omega, label="Ω", color='red')
+    # ax6.set_ylabel("Ω$_{arag}$", color='red')
+    # ax6.tick_params(axis='y', labelcolor='red')
+    # ax6.set_ylim(1.3, 2.7)
+    # for tl in ax6.get_yticklabels():
+    #     tl.set_color('red')
 
     # d13C
     ax7 = axs[3]
     ax7.plot(time, d13C, label="d13C", color='blue')
     ax7.set_ylabel("$\delta^{13}$C$_{DIC}$", color='blue')
     ax7.tick_params(axis='y', labelcolor='blue')
+    ax7.set_ylim(-1,2)
     for tl in ax7.get_yticklabels():
         tl.set_color('blue')
+
+    # D14C
+    ax8 = ax7.twinx()
+    #ax8 = axs[4]
+    ax8.plot(time, D14C, label="D14C", color='red')
+    ax8.set_ylabel("$Δ^{14}$C$_{DIC}$", color='red')
+    ax8.tick_params(axis='y', labelcolor='red')
+    ax8.set_ylim(-300,300)
+    for tl in ax8.get_yticklabels():
+        tl.set_color('red')
     
     # Custom x-axis labels
     tick_positions = []
     tick_labels = []
     for year in range(num_years):
-        for month in ["Jan", "Apr", "Jul", "Oct"]:
-            tick_positions.append(year + (["Jan", "Apr", "Jul", "Oct"].index(month) / 4))
+        for month in ["Jan", "Jul",]:
+            tick_positions.append(year + (["Jan", "Jul"].index(month) / 2))
             tick_labels.append(month)
     tick_positions.append(num_years)
     tick_labels.append("Jan")
@@ -118,7 +140,7 @@ def plot_variables(time, output, temp_celsius, salinity, title="Model results"):
     ax7.set_xticklabels(tick_labels, rotation=45, ha='right')
 
     # Set x-axis limit to end at the second April
-    ax7.set_xlim([0, 1 + 1/3])
+  # ax7.set_xlim([0, 1 + 1/3])
 
     # Add vertical grid lines for each tick
     for pos in tick_positions:
