@@ -23,7 +23,7 @@ MIXED_LAYER_DEPTH = 20  # meters
 SURFACE_AREA = 1  # m^2 
 SWD = 1029  # Seawater density kg/m^3
 MIXED_LAYER_INITIAL_D14C = ATMOSPHERIC_D14C # this is NEW from me
-MIXED_LAYER_INITIAL_d13C = ATMOSPHERIC_d13C # this is NEW from me
+MIXED_LAYER_INITIAL_d13C = ATMOSPHERIC_d13C+8.5 # this is NEW from me and assumes an equilibrium isotope fractionation from the atmosphere of +8.5 per mil
 
 # Seasonal Wind Speeds
 WIND_SPEED= 0.5
