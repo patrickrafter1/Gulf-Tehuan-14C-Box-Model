@@ -43,6 +43,11 @@ VERTICAL_MIXING_SUMMER = VERTICAL_MIXING  # no summer mixing used in Cai et al.,
 # From the text:    Winter mixing in NWA is simulated by adding 0.1 mmol m−3 DIC
 #                   daily from October to February (over 155 days).
 
+# Subsurface boundary conditions
+SUBSURFACE_DIC = 1935  # µmol/kg #calculated by Rafter for GLODAP data just upstream of Gulf of Tehuantepec
+SUBSURFACE_ALK = 2160  # µmol/kg #calculate by Rafter from existing GLODAP DIC at 20m and Chapa-Balacorta 2015 pCO2 (via CO2SYS)
+SUBSURFACE_d13C = 0.0  # per mil - based on correspondance with Wei-Jun Cai
+SUBSURFACE_D14C = 0  # per mil - based on GLODAP transect and work to identify the upwelling water mass at 100m
 
 # Seasonal Biology Flux
 RAIN_RATIO = 0.07 # PIC : POC. in sinking particles-Sarmiento et al. (2002)
@@ -51,10 +56,6 @@ RAIN_RATIO = 0.07 # PIC : POC. in sinking particles-Sarmiento et al. (2002)
 OFFSET_ORG = -22  # isotopic fractionation into organic matter
 OFFSET_CC = 2 # isotopic fractionation into CaCO3
 
-SUBSURFACE_DIC = 1935  # µmol/kg #calculated by Rafter for GLODAP data just upstream of Gulf of Tehuantepec
-SUBSURFACE_ALK = 2160  # µmol/kg #calculate by Rafter from existing GLODAP DIC at 20m and Chapa-Balacorta 2015 pCO2 (via CO2SYS)
-SUBSURFACE_d13C = 0.0  # per mil - based on correspondance with Wei-Jun Cai
-SUBSURFACE_D14C = -100  # per mil - based on GLODAP transect and work to identify the upwelling water mass at 100m
 
 # Gas Exchange Parameters
 # Calculate K0 (Henry's constant for CO2 solubility in mol/kg-sw/atm) as a function of temperature and salinity
