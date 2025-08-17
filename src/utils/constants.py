@@ -26,12 +26,15 @@ MIXED_LAYER_INITIAL_D14C = ATMOSPHERIC_D14C # this is NEW from me
 MIXED_LAYER_INITIAL_d13C = ATMOSPHERIC_d13C # this is NEW from me
 
 # Seasonal Wind Speeds
-WIND_SPEED_SUMMER = 7.0  # m/s
-WIND_SPEED_WINTER = 10.5  # m/s
+WIND_SPEED= 0.5
+WIND_SPEED_SUMMER = WIND_SPEED  # m/s
+WIND_SPEED_WINTER = WIND_SPEED  # m/s
 
 # Seasonal Vertical Mixing
-VERTICAL_MIXING_WINTER = 0.1  # 0.1 mmol m−3 DIC per day from Cai et al., 2020
-VERTICAL_MIXING_SUMMER = 0  # no summer mixing based on Cai et al., 2020
+#REORGANIZING THESE TERMS TO BE JUST ONE "VERTICAL_MIXING"
+UPWELLING_RATE_WIND_CONVERSION = 0.1022 #Based on Kris Karnauska's spatial mean estimate of Gulf of Tehuantepec upwelling rate
+#UPWELLING_RATE_WIND_CONVERSION = 1.86 #Based on Kris Karnauska's estimate of *peak* Gulf of Tehuantepec upwelling rate
+VERTICAL_MIXING = (WIND_SPEED * UPWELLING_RATE_WIND_CONVERSION)/ MIXED_LAYER_DEPTH # in units of per day or (1/day)
 
 # Seasonal Biology Flux
 RAIN_RATIO = 0.07 # PIC : POC. in sinking particles-Sarmiento et al. (2002)
