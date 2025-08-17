@@ -19,7 +19,7 @@ ATMOSPHERIC_d13C = -8  # per mil
 ATMOSPHERIC_D14C = 100  # per mil
 
 # Mixed Layer Properties
-MIXED_LAYER_DEPTH = 30  # meters
+MIXED_LAYER_DEPTH = 20  # meters
 SURFACE_AREA = 1  # m^2 
 SWD = 1029  # Seawater density kg/m^3
 
