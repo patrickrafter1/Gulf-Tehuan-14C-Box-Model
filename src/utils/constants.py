@@ -82,7 +82,7 @@ def calculate_kappa(wind_speed, temp_celsius):
 
 # Function to calculate piston velocity
 def piston_velocity(wind_speed, temp_celsius, salinity):
-    return 0.24 * calculate_kappa(wind_speed, temp_celsius) * calculate_k0(temp_celsius + 273.15, salinity)
+    return 0.27 * calculate_kappa(wind_speed, temp_celsius) * calculate_k0(temp_celsius + 273.15, salinity)
 
 # Functions to calculate equilibrium constants based on temperature and salinity
 def calc_kw(temp_kelvin, salinity):
