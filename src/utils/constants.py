@@ -47,7 +47,7 @@ VERTICAL_MIXING_SUMMER = VERTICAL_MIXING  # no summer mixing used in Cai et al.,
 SUBSURFACE_DIC = 1935  # µmol/kg #calculated by Rafter for GLODAP data just upstream of Gulf of Tehuantepec
 SUBSURFACE_ALK = 2160  # µmol/kg #calculate by Rafter from existing GLODAP DIC at 20m and Chapa-Balacorta 2015 pCO2 (via CO2SYS)
 SUBSURFACE_d13C = 0.0  # per mil - based on correspondance with Wei-Jun Cai
-SUBSURFACE_D14C = 0  # per mil - based on GLODAP transect and work to identify the upwelling water mass at 100m
+SUBSURFACE_D14C = -100  # per mil - based on GLODAP transect and work to identify the upwelling water mass at 100m
 
 # Seasonal Biology Flux
 RAIN_RATIO = 0.07 # PIC : POC. in sinking particles-Sarmiento et al. (2002)
