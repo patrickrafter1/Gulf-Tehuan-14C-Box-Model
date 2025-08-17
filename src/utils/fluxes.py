@@ -24,7 +24,7 @@ def calculate_equilibrium_constants(temp, salt):
     # local variable definitions
     Tk = temp + 273.15
     sqrtS = np.sqrt(salt)
-    Tk = temp + 273.15
+    #Tk = temp + 273.15
     centiTk = 0.01 * Tk
     invTk = 1.0 / Tk
     logTk = np.log(Tk)
