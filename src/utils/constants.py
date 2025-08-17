@@ -1,7 +1,7 @@
 import numpy as np
 
 # Experiment length
-DEFAULT_SIMULATION_LENGTH_YEARS = 45  # years
+DEFAULT_SIMULATION_LENGTH_YEARS = 15  # years
 DEFAULT_SPIN_UP_TIME = 5  # years
 TOTAL_YEARS = DEFAULT_SIMULATION_LENGTH_YEARS + DEFAULT_SPIN_UP_TIME
 TOTAL_DAYS = TOTAL_YEARS * 365
@@ -34,8 +34,8 @@ MIXED_LAYER_INITIAL_d13C = ATMOSPHERIC_d13C+8.5 # this is NEW from me and assume
 
 # Seasonal Vertical Mixing
 #REORGANIZING THESE TERMS TO BE JUST ONE "VERTICAL_MIXING"
-UPWELLING_RATE_WIND_CONVERSION = 0.1022 #Based on Kris Karnauska's spatial mean estimate of Gulf of Tehuantepec upwelling rate
-#UPWELLING_RATE_WIND_CONVERSION = 1.86 #Based on Kris Karnauska's estimate of *peak* Gulf of Tehuantepec upwelling rate
+#UPWELLING_RATE_WIND_CONVERSION = 0.1022 #Based on Kris Karnauska's spatial mean estimate of Gulf of Tehuantepec upwelling rate
+UPWELLING_RATE_WIND_CONVERSION = 1.86 #Based on Kris Karnauska's estimate of *peak* Gulf of Tehuantepec upwelling rate
 VERTICAL_MIXING = (WIND_SPEED * UPWELLING_RATE_WIND_CONVERSION)/ MIXED_LAYER_DEPTH # in units of per day or (1/day)
 
 VERTICAL_MIXING_WINTER = VERTICAL_MIXING  # 0.1 * the current DIC concentration per day was used in Cai et al., 2020 #supposed to be upwelling
