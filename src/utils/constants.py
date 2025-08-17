@@ -36,6 +36,14 @@ UPWELLING_RATE_WIND_CONVERSION = 0.1022 #Based on Kris Karnauska's spatial mean 
 #UPWELLING_RATE_WIND_CONVERSION = 1.86 #Based on Kris Karnauska's estimate of *peak* Gulf of Tehuantepec upwelling rate
 VERTICAL_MIXING = (WIND_SPEED * UPWELLING_RATE_WIND_CONVERSION)/ MIXED_LAYER_DEPTH # in units of per day or (1/day)
 
+VERTICAL_MIXING_WINTER = VERTICAL_MIXING  # 0.1 * the current DIC concentration per day was used in Cai et al., 2020 #supposed to be upwelling
+#VERTICAL_MIXING_WINTER = WIND_SPEED_WINTER / 100 # this is an experiment with Dervla to see if it looks more like her code output
+VERTICAL_MIXING_SUMMER = VERTICAL_MIXING  # no summer mixing used in Cai et al., 2020
+#VERTICAL_MIXING_SUMMER = WIND_SPEED_SUMMER /100 # this is an experiment with Dervla to see if it looks more like her code output
+# From the text:    Winter mixing in NWA is simulated by adding 0.1 mmol m−3 DIC
+#                   daily from October to February (over 155 days).
+
+
 # Seasonal Biology Flux
 RAIN_RATIO = 0.07 # PIC : POC. in sinking particles-Sarmiento et al. (2002)
 
