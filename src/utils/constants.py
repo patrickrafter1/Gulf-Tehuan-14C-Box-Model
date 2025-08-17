@@ -7,9 +7,9 @@ TOTAL_YEARS = DEFAULT_SIMULATION_LENGTH_YEARS + DEFAULT_SPIN_UP_TIME
 TOTAL_DAYS = TOTAL_YEARS * 365
 
 # Constants
-DEFAULT_TEMP_CELSIUS = 15
+DEFAULT_TEMP_CELSIUS = 27.3 #model defalt is 15 #this is WOA annual mean temperature for Gulf of Tehuantepec
 DEFAULT_TEMP_KELVIN = DEFAULT_TEMP_CELSIUS + 273.15
-DEFAULT_SALINITY = 33.5
+DEFAULT_SALINITY = 34.2 #WOA annual mean salinity at Gulf of Tehuantepec is 33.8
 # Total borate in mol/kg-sw following Uppstrom (1974)
 BORON_COEFFICIENT = 0.0004157 / 35
 
