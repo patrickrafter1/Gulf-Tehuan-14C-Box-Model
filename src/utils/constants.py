@@ -22,6 +22,8 @@ ATMOSPHERIC_D14C = 100  # per mil
 MIXED_LAYER_DEPTH = 20  # meters
 SURFACE_AREA = 1  # m^2 
 SWD = 1029  # Seawater density kg/m^3
+MIXED_LAYER_INITIAL_D14C = ATMOSPHERIC_D14C # this is NEW from me
+MIXED_LAYER_INITIAL_d13C = ATMOSPHERIC_d13C # this is NEW from me
 
 # Seasonal Wind Speeds
 WIND_SPEED_SUMMER = 7.0  # m/s
