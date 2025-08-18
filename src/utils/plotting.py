@@ -52,7 +52,7 @@ def plot_variables(time, output, temp_celsius, salinity, title="Model results"):
     ax1.plot(time, extended_salinity, label="Salinity", color='blue')
     ax1.set_ylabel("SSS", color='blue')
     ax1.tick_params(axis='y', labelcolor='blue')
-    ax1.set_ylim(33.7,34)
+    ax1.set_ylim(34,34.5)
     for tl in ax1.get_yticklabels():
         tl.set_color('blue')
 
