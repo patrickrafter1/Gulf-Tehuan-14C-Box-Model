@@ -326,8 +326,8 @@ def gas_exchange(
     piston_velocity = constants.piston_velocity(wind_speed, temp_celsius, salinity)
     piston_velocity_year = piston_velocity  # mol/(m²·yr·atm)
     
-    SeatoAir = piston_velocity_year * pco2_ocean * surface_area  # mol yr-1
-    AirtoSea = piston_velocity_year * pco2_atm * surface_area  # mol yr-1
+    SeatoAir = piston_velocity_year * (pco2_ocean/1e6) * surface_area  # mol yr-1
+    AirtoSea = piston_velocity_year * (pco2_atm/1e6) * surface_area  # mol yr-1
 
     fract_sa_c13 = eq_frac_sa_c13_permil + kinetic_frac_c13_permil
     fract_as_c13 = eq_frac_as_c13_permil + kinetic_frac_c13_permil
