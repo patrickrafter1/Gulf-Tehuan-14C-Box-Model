@@ -283,8 +283,8 @@ if __name__ == "__main__":
     temperature, salinity, ncp = load_model_forcings('ne')
 
     # Initialize the model
-    model_instance = MixedLayerModel(temp_celsius=temperature, salinity=salinity, ncp=ncp)
-    # model_instance = MixedLayerModel(temp_celsius=constants.DEFAULT_TEMP_CELSIUS, salinity=constants.DEFAULT_SALINITY, ncp=ncp)
+   # model_instance = MixedLayerModel(temp_celsius=temperature, salinity=salinity, ncp=ncp)
+    model_instance = MixedLayerModel(temp_celsius=constants.DEFAULT_TEMP_CELSIUS, salinity=constants.DEFAULT_SALINITY, ncp=ncp)
 
     
     # Run the model
