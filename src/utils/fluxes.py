@@ -364,9 +364,11 @@ def vertical_mixing(current_state, num_tracers, day_of_year):
 
     # Determine the mixing rate based on day of the year
     if day_of_year < 79 or day_of_year > 273:  # Winter period (October through February)
-        fractional_mixing = constants.VERTICAL_MIXING_WINTER / current_dic # per day
+        #fractional_mixing = constants.VERTICAL_MIXING_WINTER / current_dic # per day
+        fractional_mixing = constants.VERTICAL_MIXING_WINTER  # per day #NEW to PR I think this is the only way to get appropriate units
     else:  # Summer period (March through September)
-        fractional_mixing = constants.VERTICAL_MIXING_SUMMER / current_dic # per day
+        #fractional_mixing = constants.VERTICAL_MIXING_SUMMER / current_dic # per day
+        fractional_mixing = constants.VERTICAL_MIXING_SUMMER # per day #NEW to PR 
 
     DIC_vertical_mixing_in = fractional_mixing * constants.SUBSURFACE_DIC
     DIC_vertical_mixing_out = fractional_mixing * current_state[0]
